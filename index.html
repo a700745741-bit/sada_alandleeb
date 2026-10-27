@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صدى العندليب V14 - فرز التوقعات</title>
+<style>
+:root{--navy:#06265b;--blue:#0756c9;--gold:#ffca16;--green:#079b51;--red:#e81435;--ink:#102b50;--paper:#f2f7ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+header{background:linear-gradient(120deg,#031a42,#0759c8,#031a42);color:#fff;text-align:center;padding:22px 12px 18px;border-bottom:5px solid var(--gold)}
+header .ball{font-size:36px}h1{font-size:clamp(28px,5vw,48px);margin:4px 0;font-weight:900}header p{margin:7px 0 0;color:#ffdf42;font-weight:bold;font-size:clamp(14px,2.6vw,20px)}
+.wrap{max-width:1450px;margin:auto;padding:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{background:#fff;border:1px solid #b5cdea;border-radius:16px;overflow:hidden;box-shadow:0 3px 12px #08295712}
+.panel h2{margin:0;background:linear-gradient(90deg,#06418f,#06245b);color:white;padding:13px 16px;font-size:19px}
+.panel .inside{padding:14px}
+label{display:block;font-weight:bold;margin-bottom:8px}
+textarea{width:100%;min-height:205px;resize:vertical;border:2px solid #c5d9f1;border-radius:10px;padding:12px;font:16px/1.8 Tahoma,Arial,sans-serif;color:#172f50;background:#fbfdff}
+textarea:focus,input:focus{outline:2px solid #73a8fa;border-color:#0756c9}
+.hint{font-size:13px;color:#4a6383;margin:7px 0 0;line-height:1.7}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+button{border:0;border-radius:10px;padding:12px 17px;font:bold 15px Tahoma,Arial,sans-serif;cursor:pointer;box-shadow:0 2px 4px #001d4320}
+button:active{transform:translateY(1px)}
+.primary{background:var(--green);color:#fff;flex:1;min-width:180px;font-size:18px}
+.navy{background:var(--navy);color:#fff}.light{background:#e5edf8;color:#284667}.purple{background:#5722c7;color:#fff}.blue{background:#0871f9;color:#fff}.orange{background:#ff6b00;color:#fff}.teal{background:#049d91;color:#fff}.danger{background:var(--red);color:#fff}
+.results{background:#05265d;padding:12px;border-radius:16px;display:grid;grid-template-columns:1fr 1.2fr;gap:12px}
+.results .panel{border:0}
+table{width:100%;border-collapse:collapse;background:white}
+th{background:#071e46;color:white;padding:10px 7px}
+td{border:1px solid #c9d9eb;padding:9px 7px;text-align:center}
+tbody tr:nth-child(even){background:#f1f6fc}
+.rank{background:#ffce22;font-weight:bold;width:56px}
+td input{width:100%;min-width:0;padding:7px;border:1px solid #c5d5e8;border-radius:6px;font:inherit;text-align:center}
+.empty{text-align:center;padding:35px 12px;line-height:2;color:#526b8d}
+.sectionTitle{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.badge{background:var(--gold);color:#102b50;border-radius:30px;padding:4px 10px;font-size:13px;white-space:nowrap}
+.matchBlock{border:1px solid #d4e0f0;border-radius:10px;margin:9px;padding:10px}
+.matchBlock h3{margin:0 0 8px;color:#06418f;font-size:16px}
+.matchBlock ul{margin:0;padding-right:22px;line-height:1.8}
+.small{font-size:12px;color:#59708d;line-height:1.7;padding:0 10px}
+.status{margin:10px 0;padding:10px 12px;border-radius:8px;background:#e6f5ec;color:#116333;display:none;line-height:1.7}
+footer{background:#031a42;color:#e8f1ff;text-align:center;padding:16px;margin-top:16px;font-size:13px}
+@media(max-width:850px){.grid,.results{grid-template-columns:1fr}.wrap{padding:9px}.panel h2{font-size:17px}textarea{min-height:175px}.toolbar button{flex:1}}
+@media print{
+ body{background:white;color:#000}.no-print,header .ball,footer{display:none!important}
+ header{background:white;color:#000;border-bottom:2px solid #000;padding:8px}
+ header p{color:#000}h1{font-size:25px}.wrap{max-width:none;padding:0}
+ .grid{display:none}.results{display:block;background:white;padding:0}
+ .results .panel{border:1px solid #777;margin-bottom:10px;box-shadow:none}
+ .panel h2{background:#eee!important;color:#000;border-bottom:1px solid #777}
+ th{background:#eee!important;color:#000}td,th{padding:5px;font-size:12px}
+ td input{border:0;padding:0;background:transparent;color:#000}
+ .empty{padding:10px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="ball">⚽ 🏆</div>
+  <h1>صدى العندليب</h1>
+  <p>تحدي التوقعات للمباريات · فرز النتائج وإدارة النقاط</p>
+  <div style="margin-top:8px"><span style="background:#0756c9;padding:5px 12px;border-radius:20px;font-weight:bold">V14</span></div>
+</header>
+<main class="wrap">
+  <div class="grid no-print">
+    <section class="panel">
+      <h2>📲 رسائل المشاركين (انسخ كل الرسائل مرة واحدة)</h2>
+      <div class="inside">
+        <label for="messages">الصق رسائل واتساب هنا</label>
+        <textarea id="messages" placeholder="الصق هنا أكثر من 100 رسالة واتساب..."></textarea>
+        <p class="hint">يستخرج البرنامج الاسم من «الإسم:» أو «الاسم:»، ويقرأ الأرقام داخل الأقواس المختلفة، ويتجاهل التاريخ ورقم الهاتف.</p>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>🎯 النتائج الصحيحة للمباريات</h2>
+      <div class="inside">
+        <label for="official">الصق كليشة النتائج الصحيحة</label>
+        <textarea id="official" placeholder="الصق كليشة النتائج نفسها، وأدخل نتائج المباريات المنتهية فقط واترك البقية فارغة..."></textarea>
+        <p class="hint">يدعم مثلًا [2] أو (2) أو {2} أو 【2】. الخانة الفارغة تعني أن المباراة لم تنتهِ، ولا تُحسب صفرًا.</p>
+      </div>
+    </section>
+  </div>
+  <div class="toolbar no-print">
+    <button class="primary" id="sortBtn">⚙️ فرز النتائج</button>
+    <button class="navy" id="saveBtn">💾 حفظ البيانات</button>
+    <button class="light" id="restoreBtn">↩️ استرجاع المحفوظ</button>
+    <button class="light" id="clearBtn">🧹 مسح المدخلات</button>
+  </div>
+  <div id="status" class="status" role="status"></div>
+  <div class="results">
+    <section class="panel">
+      <h2 class="sectionTitle"><span>🏆 كشف الفائزين بكل مباراة</span><span class="badge" id="matchCount">0 مباراة مكتملة</span></h2>
+      <div id="winners" class="empty">بعد الضغط على «فرز النتائج» ستظهر أسماء الفائزين بكل مباراة هنا.</div>
+    </section>
+    <section class="panel">
+      <h2 class="sectionTitle"><span>👑 الترتيب العام للمشاركين</span><span class="badge" id="peopleCount">0 مشارك</span></h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>الترتيب</th><th>اسم المشارك</th><th>النقاط</th><th class="no-print">تعديل النقاط</th><th class="no-print">حذف</th></tr></thead>
+          <tbody id="leaderboard"><tr><td colspan="5" class="empty">لا توجد نتائج بعد.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="small">يمكن تعديل النقاط مباشرة من الجدول، وسيُعاد الترتيب تلقائيًا.</p>
+    </section>
+  </div>
+  <div class="toolbar no-print">
+    <button class="purple" onclick="window.print()">🖨️ طباعة الكشف</button>
+    <button class="blue" id="exportBtn">📄 تنزيل الكشف CSV</button>
+    <button class="orange" id="addBtn">➕ إضافة مشارك</button>
+    <button class="teal" id="editNamesBtn">✏️ تعديل الأسماء</button>
+    <button class="danger" id="deleteAllBtn">حذف جميع المشاركين</button>
+  </div>
+  <p class="small no-print">الحفظ الحالي على هذا الجهاز والمتصفح فقط. لجعل البيانات مشتركة بين عدة هواتف، يلزم ربط البرنامج بقاعدة بيانات سحابية.</p>
+</main>
+<footer>صدى العندليب V14 ✨ برنامج إدارة مسابقات التوقعات · الرياضة تجمعنا ⚽ · بالتوفيق للجميع</footer>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let participants = [];
+  let matchResults = [];
+
+  function showStatus(message, bad=false) {
+    const box = $('status');
+    box.textContent = message;
+    box.style.display = 'block';
+    box.style.background = bad ? '#ffeded' : '#e6f5ec';
+    box.style.color = bad ? '#9a1020' : '#116333';
+  }
+  function normalizeDigits(s) {
+    return String(s ?? '')
+      .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+      .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+  }
+  function cleanText(s) {
+    return String(s || '').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069\u200b-\u200d]/g,'')
+      .replace(/[*_~`]/g,'').trim();
+  }
+  // يقبل أقواس الكيبورد الشائعة، ويقبل خانة فارغة للنتائج غير المنتهية.
+  function getScoreLines(text) {
+    const out = [];
+    const lines = String(text || '').split(/\r?\n/);
+    const re = /^\s*[*_~`]*\s*(.*?)\s*[\[\(\{\【\（\［]\s*(\d{1,2})?\s*[\]\)\}\】\）\］]\s*[*_~`]*\s*$/;
+    for (const line of lines) {
+      const normalized = normalizeDigits(line);
+      const m = normalized.match(re);
+      if (!m) continue;
+      const team = cleanText(m[1]).replace(/[：:]+$/,'').trim();
+      if (!team) continue;
+      // استبعاد الأسطر التي ليست أسماء فرق
+      if (/^(الإسم|الاسم|اسم|التاريخ|الوقت)$/i.test(team)) continue;
+      out.push({team, score: m[2] === undefined || m[2] === '' ? null : Number(m[2])});
+    }
+    return out;
+  }
+  function extractName(block) {
+    const m = cleanText(block).match(/(?:الإسم|الاسم|اسم\s*المشارك)\s*[:：]\s*([^\r\n]+)/i);
+    if (!m) return '';
+    return cleanText(m[1]).replace(/[⭐✨🏆⚽📱]+/g,'').trim();
+  }
+  function splitWhatsAppMessages(text) {
+    const raw = String(text || '').replace(/\r/g,'');
+    // كل رسالة تبدأ عادةً بتاريخ واتساب بين أقواس مربعة.
+    const parts = raw.split(/(?=^\s*\[\s*\d{1,2}\s*[\/.-])/m).map(x=>x.trim()).filter(Boolean);
+    if (parts.length > 1) return parts;
+    // بديل إذا حذف المستخدم رؤوس رسائل واتساب: نفصل حسب نهاية سطر الاسم.
+    const result = [];
+    const re = /[\s\S]*?(?:الإسم|الاسم|اسم\s*المشارك)\s*[:：]\s*[^\n]+/gi;
+    let m;
+    while ((m = re.exec(raw)) !== null) result.push(m[0].trim());
+    return result.length ? result : (raw.trim() ? [raw.trim()] : []);
+  }
+  function parseParticipants(text) {
+    const blocks = splitWhatsAppMessages(text);
+    const found = [];
+    for (const block of blocks) {
+      const name = extractName(block);
+      const scores = getScoreLines(block).map(x=>x.score);
+      if (!name || !scores.length) continue;
+      found.push({name, scores, points:0, manual:false});
+    }
+    // تجنب تكرار نفس الرسالة حرفيًا، مع إبقاء مشارك يرسل توقعًا مختلفًا كرسالة منفصلة.
+    return found;
+  }
+  function parseOfficial(text) {
+    const lines = getScoreLines(text);
+    const matches = [];
+    for (let i=0; i+1<lines.length; i+=2) {
+      matches.push({team1:lines[i].team, score1:lines[i].score, team2:lines[i+1].team, score2:lines[i+1].score});
+    }
+    return matches;
+  }
+  function safe(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function renderWinners() {
+    const box = $('winners');
+    const completed = matchResults.filter(m=>m.score1 !== null && m.score2 !== null);
+    $('matchCount').textContent = completed.length + ' مباراة مكتملة';
+    if (!matchResults.length) {
+      box.className='empty'; box.textContent='لم تُقرأ نتائج بعد. الصق كليشة النتائج ثم اضغط «فرز النتائج».';
+      return;
+    }
+    if (!completed.length) {
+      box.className='empty'; box.textContent='لم تدخل نتائج مكتملة بعد. تأكد من كتابة رقم في خانتي كل مباراة انتهت.';
+      return;
+    }
+    box.className='';
+    box.innerHTML = completed.map((m, idx) => {
+      const winners = participants.filter(p => p.scores[idx*2] === m.score1 && p.scores[idx*2+1] === m.score2);
+      return `<div class="matchBlock"><h3>${idx+1}. ${safe(m.team1)} ${m.score1} - ${m.score2} ${safe(m.team2)}</h3>` +
+        (winners.length ? `<ul>${winners.map(p=>`<li>${safe(p.name)}</li>`).join('')}</ul>` : '<p class="small">لا يوجد توقع مطابق تمامًا لهذه النتيجة.</p>') +
+        `</div>`;
+    }).join('');
+  }
+  function renderBoard() {
+    participants.sort((a,b)=>b.points-a.points || a.name.localeCompare(b.name,'ar'));
+    $('peopleCount').textContent = participants.length + ' مشارك';
+    const body = $('leaderboard');
+    if (!participants.length) {
+      body.innerHTML='<tr><td colspan="5" class="empty">لا يوجد مشاركون بعد.</td></tr>';
+      return;
+    }
+    body.innerHTML = participants.map((p,i)=>`<tr>
+      <td class="rank">${i+1}</td>
+      <td>${safe(p.name)}</td>
+      <td><strong>${Number(p.points)||0}</strong></td>
+      <td class="no-print"><input type="number" min="0" step="1" value="${Number(p.points)||0}" aria-label="تعديل نقاط ${safe(p.name)}" data-points="${i}"></td>
+      <td class="no-print"><button class="danger" data-delete="${i}" style="padding:7px 10px">حذف</button></td>
+    </tr>`).join('');
+    body.querySelectorAll('[data-points]').forEach(input=>input.addEventListener('change',()=>{
+      const p=participants[Number(input.dataset.points)];
+      if(p){p.points=Math.max(0,Number(input.value)||0);renderBoard();saveQuietly();}
+    }));
+    body.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',()=>{
+      const i=Number(btn.dataset.delete);
+      if(confirm('هل تريد حذف المشارك: '+participants[i].name+'؟')){participants.splice(i,1);renderBoard();renderWinners();saveQuietly();}
+    }));
+  }
+  function sortAndCalculate() {
+    const msgText = $('messages').value;
+    const officialText = $('official').value;
+    if (!msgText.trim()) { showStatus('الصق رسائل المشاركين أولًا في المربع الأول.',true); return; }
+    if (!officialText.trim()) { showStatus('الصق كليشة النتائج الصحيحة في المربع الثاني.',true); return; }
+    const parsed = parseParticipants(msgText);
+    const official = parseOfficial(officialText);
+    if (!parsed.length) {
+      showStatus('لم أستطع استخراج أسماء وتوقعات. تأكد أن كل رسالة تحتوي على «الإسم: اسم المشارك» وأن نتائج الفرق مكتوبة داخل أقواس.',true); return;
+    }
+    if (!official.length) {
+      showStatus('لم أستطع قراءة نتائج الفرق. ضع رقم كل فريق داخل قوسين، واترك غير المنتهي فارغًا.',true); return;
+    }
+    matchResults = official;
+    participants = parsed.map(p=>{
+      let points=0;
+      official.forEach((m,i)=>{
+        if(m.score1!==null && m.score2!==null && p.scores[i*2]===m.score1 && p.scores[i*2+1]===m.score2) points++;
+      });
+      return {...p,points,manual:false};
+    });
+    renderBoard(); renderWinners(); saveQuietly();
+    const done=official.filter(m=>m.score1!==null&&m.score2!==null).length;
+    showStatus(`تم الفرز: قُرئت ${participants.length} رسالة باسم مشارك، و${official.length} مباراة، منها ${done} مكتملة. النقطة تُمنح للتوقع المطابق للنتيجة النهائية بالضبط.`);
+  }
+  function getState(){return {messages:$('messages').value,official:$('official').value,participants,matchResults};}
+  function saveQuietly(){try{localStorage.setItem('sadaAlandalibV14',JSON.stringify(getState()));}catch(e){}}
+  function save(){try{localStorage.setItem('sadaAlandalibV14',JSON.stringify(getState()));showStatus('تم حفظ البيانات على هذا الجهاز بنجاح.');}catch(e){showStatus('تعذر الحفظ في المتصفح. جرّب متصفحًا آخر أو مساحة تخزين متاحة.',true);}}
+  function restore(){
+    try{
+      const s=JSON.parse(localStorage.getItem('sadaAlandalibV14')||'null');
+      if(!s){showStatus('لا توجد بيانات محفوظة على هذا الجهاز.',true);return;}
+      $('messages').value=s.messages||'';$('official').value=s.official||'';
+      participants=Array.isArray(s.participants)?s.participants:[];
+      matchResults=Array.isArray(s.matchResults)?s.matchResults:[];
+      renderBoard();renderWinners();showStatus('تم استرجاع البيانات المحفوظة.');
+    }catch(e){showStatus('تعذر استرجاع البيانات المحفوظة.',true);}
+  }
+  function addParticipant(){
+    const name=prompt('اكتب اسم المشارك:');
+    if(!name||!name.trim())return;
+    const raw=prompt('اكتب عدد النقاط:', '0');
+    if(raw===null)return;
+    participants.push({name:name.trim(),scores:[],points:Math.max(0,Number(raw)||0),manual:true});
+    renderBoard();renderWinners();saveQuietly();showStatus('تمت إضافة المشارك.');
+  }
+  function editNames(){
+    if(!participants.length){showStatus('لا توجد أسماء لتعديلها.',true);return;}
+    const i=prompt('اكتب رقم المشارك حسب ترتيبه الحالي لتعديل اسمه:\n'+participants.map((p,i)=>`${i+1}. ${p.name}`).join('\n'));
+    if(i===null)return;
+    const n=Number(i)-1;
+    if(!Number.isInteger(n)||n<0||n>=participants.length){showStatus('رقم المشارك غير صحيح.',true);return;}
+    const name=prompt('الاسم الجديد:',participants[n].name);
+    if(name&&name.trim()){participants[n].name=name.trim();renderBoard();renderWinners();saveQuietly();showStatus('تم تعديل الاسم.');}
+  }
+  function exportCSV(){
+    if(!participants.length){showStatus('لا يوجد كشف لتنزيله.',true);return;}
+    const rows=[['الترتيب','اسم المشارك','النقاط'],...participants.map((p,i)=>[i+1,p.name,p.points])];
+    const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');
+    a.href=url;a.download='كشف-صدى-العندليب.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  }
+  $('sortBtn').addEventListener('click',sortAndCalculate);
+  $('saveBtn').addEventListener('click',save);
+  $('restoreBtn').addEventListener('click',restore);
+  $('clearBtn').addEventListener('click',()=>{
+    if(confirm('هل تريد مسح مربعي الرسائل والنتائج؟ لن تُحذف قائمة المشاركين الحالية.')){
+      $('messages').value='';$('official').value='';showStatus('تم مسح مربعي الإدخال.');saveQuietly();
+    }
+  });
+  $('addBtn').addEventListener('click',addParticipant);
+  $('editNamesBtn').addEventListener('click',editNames);
+  $('exportBtn').addEventListener('click',exportCSV);
+  $('deleteAllBtn').addEventListener('click',()=>{
+    if(confirm('هل أنت متأكد من حذف جميع المشاركين؟')){participants=[];renderBoard();renderWinners();saveQuietly();showStatus('تم حذف جميع المشاركين.');}
+  });
+  // استرجاع تلقائي عند فتح الصفحة
+  try{
+    const s=JSON.parse(localStorage.getItem('sadaAlandalibV14')||'null');
+    if(s){
+      $('messages').value=s.messages||'';$('official').value=s.official||'';
+      participants=Array.isArray(s.participants)?s.participants:[];
+      matchResults=Array.isArray(s.matchResults)?s.matchResults:[];
+      renderBoard();renderWinners();
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
