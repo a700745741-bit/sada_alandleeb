@@ -2,73 +2,116 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>صدى العندليب - مفتوح أكثر من 10</title>
+<title>صدى العندليب - عداد 20 ثانية</title>
 <style>
-:root{--p:#0b2e59;--s:#1a4b8c;--a:#25D366;--bg:#f4f7f6}
-body{font-family:Tahoma;background:var(--bg);margin:0;padding:10px}
-.header{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;padding:15px;border-radius:0 0 15px 15px;text-align:center}
-.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,.08)}
-label{font-weight:bold;font-size:13px;color:var(--p);display:block;margin:8px 0 4px}
-textarea{width:100%;border:1px solid #ccc;border-radius:8px;padding:10px;box-sizing:border-box;font-family:monospace;font-size:13px}
-button{border:none;padding:12px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:6px}
-.btn-blue{background:var(--p)} .btn-green{background:var(--a)} .btn-orange{background:#e67e22} .btn-dark{background:#34495e}
-.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold;margin:2px}
-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
-th{background:var(--p);color:#fff;padding:8px} td{border:1px solid #ddd;padding:6px;text-align:center}
-#preview{max-width:100%;border-radius:8px;display:none;margin-top:10px;border:1px solid #ddd}
-canvas{display:none}
-.auto-badge{background:#2ecc71;color:#fff;padding:6px 12px;border-radius:20px;font-size:11px}
+body{font-family:Tahoma;background:#f4f7f6;margin:0;padding:10px}
+.header{background:#0b2e59;color:#fff;padding:15px;border-radius:0 0 15px 15px;text-align:center}
+.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0}
+textarea{width:100%;border:1px solid #ccc;border-radius:8px;padding:10px;box-sizing:border-box;font-family:monospace}
+button{border:none;padding:15px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:8px;font-size:16px}
+.btn-blue{background:#0b2e59} .btn-green{background:#25D366} .btn-orange{background:#e67e22} .btn-dark{background:#34495e}
+.badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold;margin:3px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px} th{background:#0b2e59;color:#fff;padding:8px} td{border:1px solid #ddd;padding:6px;text-align:center}
+#timerBox{display:none;background:#0b2e59;color:#fff;border-radius:15px;padding:25px;text-align:center;margin:12px 0}
+#count{font-size:70px;font-weight:bold;display:block}
+#bar{height:12px;background:#ffffff33;border-radius:10px;margin-top:12px;overflow:hidden}
+#barFill{height:100%;width:0%;background:#25D366;transition:width 1s linear}
 </style>
 </head>
 <body>
-<div class="header"><h2>🔥 صدى العندليب - تحدي التوقعات</h2><p style="margin:0;font-size:12px">مفتوح العدد - يطلع أكثر من 10 فائزين - فرز تلقائي</p></div>
+<div class="header"><h2>🔥 صدى العندليب</h2><p style="margin:0;font-size:12px">اضغط الزر - عداد 20 ثانية - يعرض أكثر من 10 فائزين</p></div>
+
 <div class="card">
-<label>✅ النتيجة الصحيحة (نفس الكليشة - بمسافة أو بدون):</label>
-<textarea id="correctBox" style="height:160px" placeholder="*ميلان [2]*
-*بولونيا [0]*
-*جنوى [1]
-يوفنتوس [1]"></textarea>
-<label>📋 توقعات المشتركين (78 أو 100 أو 200 - يفرز تلقائي): <span class="auto-badge">فرز تلقائي + مفتوح العدد</span></label>
-<textarea id="subsBox" style="height:380px" placeholder="الصق كل التوقعات هنا..."></textarea>
-<div style="display:flex;gap:6px;margin-top:8px">
-<select id="mode" style="padding:10px;border-radius:8px;border:1px solid #ccc;flex:1">
+<label>✅ النتيجة الصحيحة:</label>
+<textarea id="correctBox" style="height:150px" placeholder="*[ 2 ] ليفربول
+*[ 2 ] تشلسي
+*[ 2 ] ميلان
+*[ 0 ] بولونيا"></textarea>
+<div id="correctPreview"></div>
+
+<label>📋 توقعات المشتركين (مفتوح):</label>
+<textarea id="subsBox" style="height:350px"></textarea>
+
+<select id="mode" style="padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;margin-top:6px">
 <option value="all">كل المباريات صح 100%</option>
 <option value="most">نصف المباريات وأكثر</option>
 <option value="one">مباراة واحدة على الأقل</option>
 </select>
-<button id="toggleAuto" class="btn-orange" style="width:130px" onclick="toggleAuto()">⏸️ إيقاف تلقائي</button>
+
+<button class="btn-blue" id="mainBtn" onclick="startCountdown()">🏆 اضغط للفرز - عداد 20 ثانية</button>
+
+<div id="timerBox">
+<span>جاري الحساب...</span>
+<span id="count">20</span>
+<span>ثانية</span>
+<div id="bar"><div id="barFill"></div></div>
 </div>
-<div style="margin-top:10px">
-<span id="info" class="badge" style="background:#eef">بانتظار اللصق</span>
+
+<div style="margin-top:8px">
+<span id="info" class="badge" style="background:#eef">بانتظار</span>
 <span id="total" class="badge" style="background:#f1c40f">0 مشترك</span>
 <span id="win" class="badge" style="background:#2ecc71;color:#fff">0 فائز</span>
-<span id="matchCount" class="badge" style="background:#3498db;color:#fff">0 مباراة</span>
 </div>
 </div>
+
 <div class="card">
-<h3>📊 جدول الفائزين (مفتوح - يعرض الكل)</h3>
-<table id="table"><thead><tr><th>#</th><th>الاسم</th><th>توقعه</th><th>صح</th></tr></thead><tbody id="tbody"><tr><td colspan="4" style="color:#888">الصق النتيجة والتوقعات - يطلع كل الفائزين حتى لو 50</td></tr></tbody></table>
+<h3>📊 جدول الفائزين (يعرض الكل)</h3>
+<table id="table"><thead><tr><th>#</th><th>الاسم</th><th>توقعه</th><th>صح</th></tr></thead><tbody id="tbody"><tr><td colspan="4">اضغط الزر ليبدأ العداد</td></tr></tbody></table>
 <div style="display:flex;gap:6px;margin-top:10px">
-<button class="btn-orange" style="flex:1" onclick="makeImage()">🖼️ كشف كصورة</button>
+<button class="btn-orange" style="flex:1" onclick="makeImage()">🖼️ صورة</button>
 <button class="btn-green" style="flex:1" onclick="shareWA()">💬 واتساب</button>
 </div>
-<img id="preview"><canvas id="canvas"></canvas>
 </div>
+
 <script>
-let autoEnabled=true; let lastImg='';
-function saveAuto(){localStorage.setItem('sada_correct',document.getElementById('correctBox').value);localStorage.setItem('sada_subs',document.getElementById('subsBox').value);}
-function loadAuto(){document.getElementById('correctBox').value=localStorage.getItem('sada_correct')||'';document.getElementById('subsBox').value=localStorage.getItem('sada_subs')||'';updateCounts();if(document.getElementById('subsBox').value.trim()&&document.getElementById('correctBox').value.trim()){setTimeout(sortWinners,500);}}
-function toggleAuto(){autoEnabled=!autoEnabled;document.getElementById('toggleAuto').innerText=autoEnabled?'⏸️ إيقاف تلقائي':'▶️ تفعيل تلقائي';}
-function extractScores(text){const regex=/\[[\s]*([0-9٠-٩]+)[\s]*\]/g;let out=[];let m;while((m=regex.exec(text))!==null){let num=m[1].trim();const ar='٠١٢٣٤٥٦٧٨٩';const en='0123456789';let conv='';for(let c of num){let idx=ar.indexOf(c);conv+=idx>=0?en[idx]:c;}if(conv)out.push(conv);}return out;}
-function extractName(block){let n=block.match(/الإسم:\s*([^\n🔥]+)/);if(n)return n[1].trim();let lines=block.trim().split('\n').filter(l=>l.trim()&&!l.includes('[')&&!l.includes('تحدي'));return lines[lines.length-1]?.substring(0,30).replace(/[*_]/g,'').trim()||'بدون اسم';}
-function updateCounts(){const subsText=document.getElementById('subsBox').value.trim();let blocks=subsText.split(/\n\s*\n/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/🔥/).filter(b=>b.trim().length>5);if(subsText&&blocks.length<=1&&subsText.length>20)blocks=[subsText];if(!subsText)blocks=[];document.getElementById('total').innerText=blocks.length+' مشترك';const correct=extractScores(document.getElementById('correctBox').value);document.getElementById('matchCount').innerText=Math.floor(correct.length/2)+' مباراة ('+correct.length+' توقع)';}
-function sortWinners(){saveAuto();updateCounts();const correctBox=document.getElementById('correctBox').value.trim();const subsText=document.getElementById('subsBox').value.trim();const mode=document.getElementById('mode').value;if(!correctBox||!subsText)return;const correct=extractScores(correctBox);if(correct.length===0)return;let blocks=subsText.split(/\n\s*\n/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/🔥/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/الإسم:/).filter(b=>b.trim().length>5).map(b=>'الإسم:'+b);let rows=[];blocks.forEach(block=>{const scores=extractScores(block);if(scores.length===0)return;let matchCount=0;const limit=Math.min(scores.length,correct.length);for(let i=0;i<limit;i++){if(scores[i]===correct[i])matchCount++;}let isWin=false;if(mode==='all')isWin=matchCount===correct.length&&scores.length>=correct.length;else if(mode==='most')isWin=matchCount>=Math.ceil(correct.length/2);else isWin=matchCount>=1;if(isWin){rows.push({name:extractName(block),scores:scores.join('-'),matchCount,total:correct.length});}});const tbody=document.getElementById('tbody');if(rows.length===0){tbody.innerHTML='<tr><td colspan="4">لا يوجد فائزين 100% - جرب (نصف المباريات)</td></tr>';}else{tbody.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.scores}</td><td>${r.matchCount}/${r.total}</td></tr>`).join('');}document.getElementById('win').innerText=rows.length+' فائز (عرض الكل)';document.getElementById('info').innerText='✅ تم فرز '+blocks.length+' مشترك - وجدنا '+rows.length+' فائز - عرض الكل';}
-function shareWA(){const table=document.getElementById('table').innerText;window.open('https://wa.me/?text='+encodeURIComponent('🏆 كشف الفائزين - صدى العندليب ('+document.getElementById('win').innerText+')\n'+document.getElementById('info').innerText+'\n\n'+table),'_blank');}
-function makeImage(){const table=document.getElementById('table');const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');canvas.width=650;canvas.height=100+table.rows.length*32;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#0b2e59';ctx.fillRect(0,0,canvas.width,60);ctx.fillStyle='#fff';ctx.font='bold 18px Tahoma';ctx.textAlign='center';ctx.fillText('🏆 كشف الفائزين - صدى العندليب - '+document.getElementById('win').innerText,325,38);let y=85;ctx.fillStyle='#222';ctx.font='13px Tahoma';ctx.textAlign='right';for(let r of table.rows){let txt='';for(let c of r.cells)txt+=c.innerText+' | ';ctx.fillText(txt,630,y);y+=30;}lastImg=canvas.toDataURL('image/png');document.getElementById('preview').src=lastImg;document.getElementById('preview').style.display='block';}
-document.getElementById('correctBox').addEventListener('input',()=>{saveAuto();updateCounts();if(autoEnabled)sortWinners();});
-document.getElementById('subsBox').addEventListener('paste',()=>{document.getElementById('info').innerText='⏳ جاري اللصق والفرز...';setTimeout(()=>{saveAuto();updateCounts();if(autoEnabled)sortWinners();},600);});
-document.getElementById('subsBox').addEventListener('input',()=>{saveAuto();updateCounts();if(autoEnabled&&document.getElementById('subsBox').value.length>30){clearTimeout(window._t);window._t=setTimeout(sortWinners,800);}});
-document.getElementById('mode').addEventListener('change',sortWinners);
+let timerInterval=null;
+function saveAuto(){localStorage.setItem('sada_c',correctBox.value);localStorage.setItem('sada_s',subsBox.value);}
+function loadAuto(){correctBox.value=localStorage.getItem('sada_c')||'';subsBox.value=localStorage.getItem('sada_s')||'';updateCounts();}
+function extractScores(t){let out=[];let re=/\[\s*([0-9٠-٩]+)\s*\]/g;let m;while((m=re.exec(t))!==null){let num=m[1];let ar='٠١٢٣٤٥٦٧٨٩',en='0123456789',c='';for(let ch of num){let i=ar.indexOf(ch);c+=i>=0?en[i]:ch;}if(c)out.push(c);}return out;}
+function extractName(b){let n=b.match(/الإسم:\s*([^\n\*🔥\[]+)/);if(n)return n[1].replace(/\*/g,'').trim();let lines=b.split('\n').map(l=>l.replace(/[\*_]/g,'').trim()).filter(l=>l.length>2&&!l.includes('['));return lines[lines.length-1]?.substring(0,35)||'بدون اسم';}
+function splitBlocks(t){if(!t.trim())return[];let blocks=[];let byDash=t.split(/[-_]{10,}/);if(byDash.length>1){byDash.forEach(b=>{if(b.includes('['))blocks.push(b);});if(blocks.length)return blocks;}let byName=t.split(/(?=\*الإسم:)/);byName.forEach(b=>{if(b.trim().length>10)blocks.push(b);});if(blocks.length>=2)return blocks;let byEmpty=t.split(/\n\s*\n/).filter(b=>b.trim().length>10);if(byEmpty.length)return byEmpty;return [t];}
+function updateCounts(){let blocks=splitBlocks(subsBox.value);total.innerText=blocks.length+' مشترك';let c=extractScores(correctBox.value);if(c.length)correctPreview.innerHTML='<span class="badge" style="background:#2ecc71;color:#fff">قرأت: '+c.join(' - ')+'</span>';}
+
+function startCountdown(){
+  saveAuto();
+  if(!correctBox.value.trim()||!subsBox.value.trim()){alert('الصق النتيجة والتوقعات');return;}
+  if(extractScores(correctBox.value).length==0){alert('ما قرأت النتيجة');return;}
+  mainBtn.disabled=true;mainBtn.innerText='⏳ جاري العد 20 ثانية...';
+  timerBox.style.display='block';tbody.innerHTML='<tr><td colspan="4">⏳ العد التنازلي...</td></tr>';
+  let sec=20;count.innerText=sec;barFill.style.width='0%';
+  timerInterval=setInterval(()=>{
+    sec--;count.innerText=sec;barFill.style.width=((20-sec)/20*100)+'%';
+    if(sec<=0){clearInterval(timerInterval);timerBox.style.display='none';mainBtn.disabled=false;mainBtn.innerText='🏆 اضغط للفرز - عداد 20 ثانية';doSort();}
+  },1000);
+}
+
+function doSort(){
+  let correct=extractScores(correctBox.value);
+  let blocks=splitBlocks(subsBox.value);
+  let rows=[];
+  blocks.forEach(b=>{
+    let scores=extractScores(b);
+    if(!scores.length)return;
+    let match=0;let lim=Math.min(scores.length,correct.length);
+    for(let i=0;i<lim;i++)if(scores[i]==correct[i])match++;
+    let win=false;
+    if(mode.value=='all')win=match==correct.length;
+    else if(mode.value=='most')win=match>=Math.ceil(correct.length/2);
+    else win=match>=1;
+    if(win)rows.push({name:extractName(b),scores:scores.join(' - '),match,total:correct.length});
+  });
+  if(rows.length==0)tbody.innerHTML='<tr><td colspan="4">لا يوجد فائزين 100% - جرب نصف المباريات</td></tr>';
+  else tbody.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.scores}</td><td>${r.match}/${r.total}</td></tr>`).join('');
+  win.innerText=rows.length+' فائز (عرض الكل)';
+  info.innerText='✅ انتهى - '+blocks.length+' مشترك - '+rows.length+' فائز';
+  total.innerText=blocks.length+' مشترك';
+}
+
+function shareWA(){let t=table.innerText;window.open('https://wa.me/?text='+encodeURIComponent('🏆 كشف الفائزين\n'+info.innerText+'\n\n'+t),'_blank');}
+function makeImage(){let c=document.createElement('canvas');let ctx=c.getContext('2d');c.width=700;c.height=120+table.rows.length*34;ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#0b2e59';ctx.fillRect(0,0,c.width,65);ctx.fillStyle='#fff';ctx.font='bold 18px Tahoma';ctx.textAlign='center';ctx.fillText('🏆 كشف الفائزين - '+win.innerText,350,42);let y=90;ctx.fillStyle='#000';ctx.font='13px Tahoma';ctx.textAlign='right';for(let r of table.rows){let txt='';for(let cel of r.cells)txt+=cel.innerText+' | ';ctx.fillText(txt,680,y);y+=32;}let img=new Image();img.src=c.toDataURL();let w=window.open('');w.document.write('<img src="'+c.toDataURL()+'" style="max-width:100%">');}
+
+correctBox.addEventListener('input',()=>{saveAuto();updateCounts();});
+subsBox.addEventListener('input',()=>{saveAuto();updateCounts();});
 loadAuto();
 </script>
 </body>
