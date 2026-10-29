@@ -2,153 +2,197 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>صدى العندليب - قسمين</title>
+<title>صدى العندليب - التوقع مع الاسم</title>
 <style>
 body{font-family:Tahoma;background:#f4f7f6;margin:0;padding:10px}
-.header{background:#0b2e59;color:#fff;padding:15px;border-radius:0 0 15px 15px;text-align:center}
-.card{background:#fff;border-radius:12px;padding:14px;margin:12px 0;box-shadow:0 2px 6px rgba(0,0,0,.1);border-top:4px solid #0b2e59}
-.card2{border-top:4px solid #2ecc71}
-label{font-weight:bold;font-size:14px;display:block;margin:8px 0 6px}
-textarea{width:100%;border:2px solid #ccc;border-radius:10px;padding:12px;box-sizing:border-box;font-family:monospace;font-size:13px}
-textarea:focus{border-color:#0b2e59;outline:none}
-button{border:none;padding:16px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:10px;font-size:17px}
-.btn-blue{background:#0b2e59} .badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold;margin:3px}
-table{width:100%;border-collapse:collapse;margin-top:10px} th{background:#0b2e59;color:#fff;padding:8px} td{border:1px solid #ddd;padding:7px;text-align:center;font-size:13px}
-#timerBox{display:none;background:#0b2e59;color:#fff;border-radius:15px;padding:25px;text-align:center;margin:12px 0}
-#count{font-size:70px;font-weight:bold;display:block}
-#bar{height:12px;background:#ffffff33;border-radius:10px;margin-top:12px;overflow:hidden}
+.header{background:#0b2e59;color:#fff;padding:14px;border-radius:0 0 14px 14px;text-align:center}
+.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,.1);border-top:4px solid #0b2e59}
+.card2{border-top:4px solid #25D366}
+label{font-weight:bold;font-size:13px;display:block;margin:6px 0}
+textarea{width:100%;border:2px solid #ccc;border-radius:10px;padding:10px;box-sizing:border-box;font-family:monospace;font-size:13px}
+button{border:none;padding:15px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:8px;font-size:16px}
+.btn-blue{background:#0b2e59}
+.badge{display:inline-block;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:bold;margin:3px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+th{background:#0b2e59;color:#fff;padding:8px}
+td{border:1px solid #ddd;padding:8px;text-align:right}
+td.center{text-align:center}
+#timerBox{display:none;background:#0b2e59;color:#fff;border-radius:12px;padding:22px;text-align:center;margin:10px 0}
+#count{font-size:65px;font-weight:bold;display:block}
+#bar{height:10px;background:#ffffff33;border-radius:10px;margin-top:10px;overflow:hidden}
 #barFill{height:100%;width:0%;background:#25D366;transition:width 1s linear}
-#correctShow{display:none;background:#e8f5e9;border:2px solid #2ecc71;border-radius:10px;padding:14px;margin-top:10px;text-align:center}
-#correctShow b{font-size:20px;color:#0b2e59;display:block}
+#correctShow{background:#e8f5e9;border:2px solid #2ecc71;border-radius:10px;padding:12px;margin-top:8px;text-align:center}
+#correctShow b{font-size:18px;color:#0b2e59;display:block;word-break:break-all}
+.name-box{background:#eef2ff;border:1px solid #0b2e59;border-radius:6px;padding:4px 8px;display:inline-block;font-weight:bold;color:#0b2e59}
+.score-box{background:#e8f5e9;border:1px solid #2ecc71;border-radius:6px;padding:4px 8px;display:inline-block;font-weight:bold;color:#155724;margin-right:5px}
 </style>
 </head>
 <body>
-<div class="header"><h2>🔥 صدى العندليب - قسمين</h2><p style="margin:0;font-size:12px">قسم التوقعات + قسم النتيجة الصحيحة بنفس الكليشة - عداد 20 ثانية</p></div>
+<div class="header"><h2>🔥 صدى العندليب</h2><p style="margin:0;font-size:11px">يطلع التوقع مع الاسم - عدد مفتوح - عداد 20 ثانية</p></div>
 
-<!-- القسم الأول -->
 <div class="card">
-<label style="color:#0b2e59">📋 القسم الأول: كل التوقعات (الصق 78 أو 100 أو 237 توقع هنا):</label>
-<textarea id="allBox" style="height:380px" placeholder="الصق هنا كل توقعات المشتركين بنفس الكليشة... 
-مثال:
-
-*ليفربول [ 1 ]
-*تشلسي [ 2 ]
-*ميلان [ 2 ]
-*بولونيا [ 0 ]
-*الإسم: محمد
-
-*ليفربول [ 2 ]
-*تشلسي [ 2 ]
-... وهكذا"></textarea>
-<div style="margin-top:6px">
+<label style="color:#0b2e59">📋 القسم الأول: كل التوقعات (مفتوح):</label>
+<textarea id="allBox" style="height:340px"></textarea>
 <span id="total" class="badge" style="background:#f1c40f">0 مشترك</span>
 <span id="win" class="badge" style="background:#2ecc71;color:#fff">0 فائز</span>
 </div>
-</div>
 
-<!-- القسم الثاني -->
 <div class="card card2">
-<label style="color:#2ecc71">✅ القسم الثاني: النتائج الصحيحة (اطرح نفس الكليشة فيها نتائج كل المباريات الصحيحة):</label>
-<textarea id="correctBox" style="height:180px;border-color:#2ecc71" placeholder="اطرح هنا نفس الكليشة فيها النتائج الصحيحة كاملة:
-*الأربعاء | ⏰ ال 10.30 مساءا
-*ليفربول [ 2 ]
-*تشلسي [ 2 ]
-*الأربعاء | ⏰ ال 11 مساءا
-*ميلان [ 2 ]
-*بولونيا [ 0 ]
-*الإسم: النتيجة الصحيحة"></textarea>
+<label style="color:#25D366">✅ القسم الثاني: النتائج الصحيحة بنفس الكليشة (عدد مفتوح):</label>
+<textarea id="correctBox" style="height:170px;border-color:#25D366"></textarea>
 
 <div id="correctShow">
-<div style="font-size:12px;color:#666">✅ التوقع الصحيح الذي قرأته من القسم الثاني:</div>
+<div style="font-size:11px;color:#666">✅ التوقع الصحيح الذي قرأته:</div>
 <b id="correctText">-</b>
-<div id="correctCount" class="badge" style="background:#0b2e59;color:#fff;margin-top:6px"></div>
+<div id="correctCount" class="badge" style="background:#0b2e59;color:#fff"></div>
 </div>
 
-<select id="mode" style="padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;margin-top:10px">
-<option value="all">كل المباريات صح 100%</option>
-<option value="most">نصف المباريات وأكثر</option>
+<select id="mode" style="padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;margin-top:8px">
+<option value="all" selected>مطابق 100% (عدد مفتوح)</option>
+<option value="most">أكثر من نصف صح</option>
 <option value="one">مباراة واحدة على الأقل</option>
 </select>
 
-<button class="btn-blue" id="mainBtn" onclick="startCountdown()">🏆 اضغط هنا للفرز - عداد 20 ثانية</button>
+<button class="btn-blue" id="mainBtn" onclick="startCountdown()">🏆 اضغط للفرز - عداد 20 ثانية</button>
 
 <div id="timerBox">
-<span>جاري مطابقة كل التوقعات مع النتيجة الصحيحة...</span>
+<span>جاري فرز التوقع مع الاسم...</span>
 <span id="count">20</span>
-<span>ثانية</span>
 <div id="bar"><div id="barFill"></div></div>
 </div>
 
-<span id="info" class="badge" style="background:#eef;margin-top:8px;display:inline-block">بانتظار الضغط</span>
+<div id="info" class="badge" style="background:#eef;margin-top:8px;display:block;text-align:center">بانتظار</div>
 </div>
 
-<!-- النتائج -->
 <div class="card">
-<h3>📊 جدول الفائزين (يعرض الكل - أكثر من 10)</h3>
-<table id="table"><thead><tr><th>#</th><th>الاسم</th><th>توقعه</th><th>مطابق</th></tr></thead><tbody id="tbody"><tr><td colspan="4">الصق القسمين واضغط الزر</td></tr></tbody></table>
+<h3>📊 جدول الفائزين - يطلع التوقع مع الاسم (عدد مفتوح - أكثر من 10)</h3>
+<table id="table"><thead><tr><th>#</th><th>التوقع مع الاسم</th><th class="center">مطابق</th></tr></thead><tbody id="tbody"><tr><td colspan="3" style="text-align:center">بانتظار</td></tr></tbody></table>
 </div>
 
 <script>
 let timerInterval=null;
-function extractScores(t){let out=[];let re=/\[\s*([0-9٠-٩]+)\s*\]/g;let m;while((m=re.exec(t))!==null){let num=m[1];let ar='٠١٢٣٤٥٦٧٨٩',en='0123456789',c='';for(let ch of num){let i=ar.indexOf(ch);c+=i>=0?en[i]:ch;}if(c)out.push(c);}return out;}
-function extractName(b){let n=b.match(/الإسم:\s*([^\n\*🔥\[]+)/);if(n)return n[1].replace(/\*/g,'').trim();let lines=b.split('\n').map(l=>l.replace(/[\*_]/g,'').trim()).filter(l=>l.length>2&&!l.includes('['));return lines[lines.length-1]?.substring(0,35)||'بدون اسم';}
-function splitBlocks(t){if(!t.trim())return[];let blocks=t.split(/[-_]{10,}/).filter(b=>b.includes('['));if(blocks.length>=2)return blocks;blocks=t.split(/(?=\*الإسم:)/).filter(b=>b.trim().length>10);if(blocks.length>=2)return blocks;return t.split(/\n\s*\n/).filter(b=>b.includes('['));}
+
+function extractScores(t){
+  let out=[]; let re=/\[\s*([0-9٠-٩]+)\s*\]/g; let m;
+  while((m=re.exec(t))!==null){
+    let num=m[1]; let ar='٠١٢٣٤٥٦٧٨٩', en='0123456789', c='';
+    for(let ch of num){ let i=ar.indexOf(ch); c+= i>=0? en[i] : ch; }
+    if(c!=='') out.push(c);
+  }
+  return out;
+}
+
+function extractName(b){
+  // يحاول يقرأ الإسم: بكل الأشكال
+  let patterns = [
+    /\*الإسم:\s*([^\n\r\*]+)/,
+    /الإسم:\s*([^\n\r\*]+)/,
+    /الاسم:\s*([^\n\r\*]+)/,
+    /\*الاسم:\s*([^\n\r\*]+)/
+  ];
+  for(let p of patterns){
+    let m=b.match(p);
+    if(m && m[1].trim().length>1){
+      return m[1].replace(/[\*\_\-]+/g,'').trim().substring(0,35);
+    }
+  }
+  // احتياط: آخر سطر
+  let lines=b.split('\n').map(l=>l.replace(/[\*_]/g,'').trim()).filter(l=>l.length>2 && !l.includes('[') && !l.includes('الأربعاء') && !l.includes('تحدي') && !l.includes('10.30'));
+  return lines[lines.length-1]?.substring(0,35) || 'بدون اسم';
+}
+
+function splitBlocks(t){
+  if(!t.trim()) return [];
+  let blocks=t.split(/[-_]{8,}/).map(s=>s.trim()).filter(s=>s.includes('[') && s.length>10);
+  if(blocks.length>=1) return blocks;
+  blocks=t.split(/(?=\*الإسم:)/).map(s=>s.trim()).filter(s=>s.includes('['));
+  if(blocks.length>=1) return blocks;
+  return t.split(/\n\s*\n/).filter(s=>s.includes('['));
+}
 
 function updateCounts(){
   let blocks=splitBlocks(allBox.value);
-  total.innerText=blocks.length+' مشترك في القسم الأول';
+  total.innerText=blocks.length+' مشترك';
   let c=extractScores(correctBox.value);
   if(c.length){
-    correctShow.style.display='block';
     correctText.innerText=c.join(' - ');
-    correctCount.innerText=c.length+' توقع صحيح ('+Math.ceil(c.length/2)+' مباراة)';
+    correctCount.innerText=c.length+' توقع صحيح (مفتوح)';
   }
 }
 
 function startCountdown(){
   let blocks=splitBlocks(allBox.value);
   let correct=extractScores(correctBox.value);
-  if(!allBox.value.trim()){alert('الصق كل التوقعات في القسم الأول');return;}
-  if(!correctBox.value.trim()){alert('اطرح النتائج الصحيحة في القسم الثاني');return;}
-  if(correct.length==0){alert('ما قرأت النتيجة الصحيحة في القسم الثاني - تأكد فيها [2]');return;}
-  if(blocks.length==0){alert('ما قرأت توقعات في القسم الأول');return;}
+  if(!allBox.value.trim()){alert('الصق التوقعات في القسم الأول');return;}
+  if(!correctBox.value.trim()){alert('الصق النتائج الصحيحة في القسم الثاني');return;}
+  if(correct.length==0){alert('ما قرأت النتيجة - لازم [رقم]');return;}
 
-  // أظهر التوقع الصحيح
-  correctShow.style.display='block';
   correctText.innerText=correct.join(' - ');
-  correctCount.innerText=correct.length+' توقع صحيح';
+  correctCount.innerText=correct.length+' توقع صحيح (مفتوح)';
 
-  mainBtn.disabled=true;mainBtn.innerText='⏳ العد 20 ثانية...';
-  timerBox.style.display='block';tbody.innerHTML='<tr><td colspan="4">⏳ العد التنازلي 20 ثانية...</td></tr>';
-  let sec=20;count.innerText=sec;barFill.style.width='0%';
+  mainBtn.disabled=true; mainBtn.innerText='⏳ العد 20 ثانية...';
+  timerBox.style.display='block'; tbody.innerHTML='<tr><td colspan="3" style="text-align:center">⏳ العد 20 ثانية...</td></tr>';
+  let sec=20; count.innerText=sec; barFill.style.width='0%';
   timerInterval=setInterval(()=>{
-    sec--;count.innerText=sec;barFill.style.width=((20-sec)/20*100)+'%';
-    if(sec<=0){clearInterval(timerInterval);timerBox.style.display='none';mainBtn.disabled=false;mainBtn.innerText='🏆 اضغط هنا للفرز - عداد 20 ثانية';doSort();}
+    sec--; count.innerText=sec; barFill.style.width=((20-sec)/20*100)+'%';
+    if(sec<=0){clearInterval(timerInterval); timerBox.style.display='none'; mainBtn.disabled=false; mainBtn.innerText='🏆 اضغط للفرز - عداد 20 ثانية'; doSort();}
   },1000);
 }
 
 function doSort(){
   let blocks=splitBlocks(allBox.value);
   let correct=extractScores(correctBox.value);
+  let modeVal=mode.value;
   let rows=[];
+
   blocks.forEach(b=>{
     let scores=extractScores(b);
-    if(!scores.length)return;
-    let match=0;let lim=Math.min(scores.length,correct.length);
-    for(let i=0;i<lim;i++)if(scores[i]==correct[i])match++;
-    let win=false;
-    if(mode.value=='all')win=match==correct.length;
-    else if(mode.value=='most')win=match>=Math.ceil(correct.length/2);
-    else win=match>=1;
-    if(win)rows.push({name:extractName(b),scores:scores.join(' - '),match,total:correct.length});
+    if(!scores.length) return;
+    let name=extractName(b);
+    let match=0;
+    let lim=Math.min(scores.length, correct.length);
+    for(let i=0;i<lim;i++) if(scores[i]==correct[i]) match++;
+
+    let isWin=false;
+    if(modeVal=='all'){
+      isWin = (scores.length==correct.length && match==correct.length);
+    } else if(modeVal=='most'){
+      isWin = match >= Math.ceil(correct.length/2);
+    } else if(modeVal=='one'){
+      isWin = match >=1;
+    }
+
+    if(isWin){
+      // هنا يطلع التوقع مع الاسم مع بعض
+      rows.push({
+        name: name,
+        scores: scores.join(' - '),
+        full: name + ' | توقعه: ' + scores.join(' - '),
+        match: match,
+        total: correct.length
+      });
+    }
   });
+
   if(rows.length==0){
-    tbody.innerHTML='<tr><td colspan="4">لا يوجد فائزين 100%<br>التوقع الصحيح هو: <b>'+correct.join(' - ')+'</b><br>جرب نصف المباريات</td></tr>';
-  }else{
-    tbody.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.scores}</td><td>${r.match}/${r.total}</td></tr>`).join('');
+    tbody.innerHTML='<tr><td colspan="3" style="text-align:center">لا يوجد فائزين 100%<br>الصحيح ('+correct.length+' توقع): <b>'+correct.join(' - ')+'</b><br>'+blocks.length+' مشترك</td></tr>';
+  } else {
+    // يطلع التوقع مع الاسم في نفس الخلية
+    tbody.innerHTML=rows.map((r,i)=>
+      `<tr>
+        <td class="center">${i+1}</td>
+        <td>
+          <span class="name-box">👤 ${r.name}</span>
+          <span class="score-box">🔢 ${r.scores}</span>
+          <div style="margin-top:4px;font-size:11px;color:#666">التوقع مع الاسم: ${r.name} - ${r.scores}</div>
+        </td>
+        <td class="center"><b>${r.match}/${r.total}</b></td>
+      </tr>`
+    ).join('');
   }
-  win.innerText=rows.length+' فائز (عرض الكل)';
-  info.innerText='✅ التوقع الصحيح: '+correct.join(' - ')+' | وجدنا '+rows.length+' فائز من '+blocks.length;
+
+  win.innerText=rows.length+' فائز';
+  info.innerText='✅ عدد مفتوح: الصحيح '+correct.length+' توقع | '+correct.join(' - ')+' | وجدنا '+rows.length+' فائز من '+blocks.length+' - يطلع التوقع مع الاسم';
 }
 
 allBox.addEventListener('input',updateCounts);
