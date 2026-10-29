@@ -1,329 +1,75 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صدى العندليب - V16</title>
-    <style>
-        :root { --primary:#0b2e59; --secondary:#1a4b8c; --accent:#2ecc71; --danger:#e74c3c; --bg:#f4f7f6; --whatsapp:#25D366; }
-        body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);margin:0;color:#333}
-        .header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;text-align:center;padding:20px 10px;border-radius:0 0 20px 20px}
-        .container{padding:15px;max-width:800px;margin:auto}
-        .card{background:#fff;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,.05)}
-        .card-title{background:var(--primary);color:#fff;padding:10px;border-radius:8px;margin:-15px -15px 15px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
-        textarea,input[type=text]{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;margin-bottom:10px;font-family:inherit}
-        textarea{height:120px;resize:vertical} 
-        button{border:none;padding:11px;border-radius:8px;cursor:pointer;font-weight:bold;width:100%;font-size:14px;margin-top:6px;color:#fff}
-        .btn-green{background:var(--accent)} .btn-blue{background:var(--secondary)} .btn-red{background:var(--danger)} .btn-whatsapp{background:var(--whatsapp)} .btn-dark{background:#34495e} .btn-orange{background:#e67e22}
-        .row{display:flex;gap:8px} .row button{flex:1}
-        .match-result{border:1px solid #eee;padding:10px;border-radius:8px;background:#fafafa;margin-bottom:8px}
-        table{width:100%;border-collapse:collapse;margin-top:10px} th,td{padding:8px;text-align:center;border-bottom:1px solid #eee} th{background:var(--primary);color:#fff}
-        td input{width:50px;padding:5px;text-align:center;border:1px solid #ccc;border-radius:4px}
-        .delete-btn{background:var(--danger);color:#fff;border:none;padding:5px 10px;border-radius:4px;width:auto;font-size:12px}
-        .footer{text-align:center;font-size:12px;color:#888;margin-top:20px;padding-bottom:20px}
-        #canvasPreview{max-width:100%;border:1px solid #ddd;border-radius:8px;margin-top:10px;display:none}
-        #fileInput{display:none}
-        
-        /* تنسيق مربع البحث الجديد */
-        .search-box {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid var(--secondary);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: inherit;
-            background-color: #f9fbfd;
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صدى العندليب - مفتوح أكثر من 10</title>
+<style>
+:root{--p:#0b2e59;--s:#1a4b8c;--a:#25D366;--bg:#f4f7f6}
+body{font-family:Tahoma;background:var(--bg);margin:0;padding:10px}
+.header{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;padding:15px;border-radius:0 0 15px 15px;text-align:center}
+.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,.08)}
+label{font-weight:bold;font-size:13px;color:var(--p);display:block;margin:8px 0 4px}
+textarea{width:100%;border:1px solid #ccc;border-radius:8px;padding:10px;box-sizing:border-box;font-family:monospace;font-size:13px}
+button{border:none;padding:12px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;width:100%;margin-top:6px}
+.btn-blue{background:var(--p)} .btn-green{background:var(--a)} .btn-orange{background:#e67e22} .btn-dark{background:#34495e}
+.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold;margin:2px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+th{background:var(--p);color:#fff;padding:8px} td{border:1px solid #ddd;padding:6px;text-align:center}
+#preview{max-width:100%;border-radius:8px;display:none;margin-top:10px;border:1px solid #ddd}
+canvas{display:none}
+.auto-badge{background:#2ecc71;color:#fff;padding:6px 12px;border-radius:20px;font-size:11px}
+</style>
 </head>
 <body>
-<div class="header"><h1>🏆 صدى العندليب - V16</h1><p>تحدي التوقعات - عدد مفتوح - يعمل بدون نت</p></div>
-<div class="container">
-
+<div class="header"><h2>🔥 صدى العندليب - تحدي التوقعات</h2><p style="margin:0;font-size:12px">مفتوح العدد - يطلع أكثر من 10 فائزين - فرز تلقائي</p></div>
 <div class="card">
-<div class="card-title">📲 رسائل المشاركين</div>
-<textarea id="messagesInput" placeholder="الصق عدد مفتوح من الرسائل"></textarea>
-<button class="btn-green" onclick="processMessages()">حفظ واستخراج الأسماء</button>
-<div class="row"><input type="text" id="manualName" placeholder="إضافة اسم يدوي"><button class="btn-blue" style="width:100px" onclick="addManualName()">إضافة</button></div>
+<label>✅ النتيجة الصحيحة (نفس الكليشة - بمسافة أو بدون):</label>
+<textarea id="correctBox" style="height:160px" placeholder="*ميلان [2]*
+*بولونيا [0]*
+*جنوى [1]
+يوفنتوس [1]"></textarea>
+<label>📋 توقعات المشتركين (78 أو 100 أو 200 - يفرز تلقائي): <span class="auto-badge">فرز تلقائي + مفتوح العدد</span></label>
+<textarea id="subsBox" style="height:380px" placeholder="الصق كل التوقعات هنا..."></textarea>
+<div style="display:flex;gap:6px;margin-top:8px">
+<select id="mode" style="padding:10px;border-radius:8px;border:1px solid #ccc;flex:1">
+<option value="all">كل المباريات صح 100%</option>
+<option value="most">نصف المباريات وأكثر</option>
+<option value="one">مباراة واحدة على الأقل</option>
+</select>
+<button id="toggleAuto" class="btn-orange" style="width:130px" onclick="toggleAuto()">⏸️ إيقاف تلقائي</button>
 </div>
-
+<div style="margin-top:10px">
+<span id="info" class="badge" style="background:#eef">بانتظار اللصق</span>
+<span id="total" class="badge" style="background:#f1c40f">0 مشترك</span>
+<span id="win" class="badge" style="background:#2ecc71;color:#fff">0 فائز</span>
+<span id="matchCount" class="badge" style="background:#3498db;color:#fff">0 مباراة</span>
+</div>
+</div>
 <div class="card">
-<div class="card-title">🎯 النتائج الصحيحة</div>
-<textarea id="resultsInput" placeholder="الصق كليشة النتائج"></textarea>
-<button class="btn-blue" onclick="processResults()">فرز النتائج</button>
+<h3>📊 جدول الفائزين (مفتوح - يعرض الكل)</h3>
+<table id="table"><thead><tr><th>#</th><th>الاسم</th><th>توقعه</th><th>صح</th></tr></thead><tbody id="tbody"><tr><td colspan="4" style="color:#888">الصق النتيجة والتوقعات - يطلع كل الفائزين حتى لو 50</td></tr></tbody></table>
+<div style="display:flex;gap:6px;margin-top:10px">
+<button class="btn-orange" style="flex:1" onclick="makeImage()">🖼️ كشف كصورة</button>
+<button class="btn-green" style="flex:1" onclick="shareWA()">💬 واتساب</button>
 </div>
-
-<div class="card">
-<div class="card-title"><span>🏆 المتوقعين صح</span><span id="winnersCount" style="background:#f1c40f;color:#333;padding:2px 8px;border-radius:10px;font-size:12px">0</span></div>
-<div id="winnersList"><p style="text-align:center;color:#888">لم يتم الفرز بعد</p></div>
-<div class="row">
-<button class="btn-orange" onclick="generateWinnersImage()">🖼️ إرسال المتوقعين صح كصورة</button>
-<button class="btn-whatsapp" onclick="shareWinnersWhatsApp()">💬 نص واتساب</button>
+<img id="preview"><canvas id="canvas"></canvas>
 </div>
-</div>
-
-<div class="card">
-<div class="card-title"><span>👑 الترتيب العام - مفتوح</span><span id="participantCount" style="background:#f1c40f;color:#333;padding:2px 8px;border-radius:10px;font-size:12px">0</span></div>
-
-<!-- مربع البحث الجديد -->
-<input type="text" id="searchInput" class="search-box" placeholder="🔍 ابحث عن اسم مشارك هنا..." onkeyup="filterTable()">
-
-<table><thead><tr><th>#</th><th>الاسم</th><th>النقاط</th><th>حذف</th></tr></thead><tbody id="leaderboardBody"><tr><td colspan="4" style="color:#888">لا يوجد</td></tr></tbody></table>
-<div class="row">
-<button class="btn-orange" onclick="generateTableImage()">🖼️ إرسال الجدول كصورة</button>
-<button class="btn-whatsapp" onclick="shareTableWhatsApp()">💬 الجدول نص</button>
-</div>
-<img id="canvasPreview"><canvas id="mainCanvas" style="display:none"></canvas>
-<div id="imageActions" style="display:none" class="row">
-<button class="btn-green" onclick="downloadImage()">⬇️ تحميل الصورة</button>
-<button class="btn-whatsapp" onclick="shareImageWhatsApp()">📤 مشاركة الصورة واتساب</button>
-</div>
-</div>
-
-<div class="card">
-<div class="card-title">💾 النسخ الاحتياطي</div>
-<div class="row">
-<button class="btn-dark" onclick="exportBackup()">تصدير نسخة</button>
-<button class="btn-blue" onclick="document.getElementById('fileInput').click()">استيراد نسخة</button>
-</div>
-<input type="file" id="fileInput" accept=".json" onchange="importBackup(event)">
-<button class="btn-red" style="margin-top:12px" onclick="clearAllData()">مسح الكل</button>
-</div>
-
-<div class="footer">يحفظ تلقائي بدون نت - عدد مفتوح - الجدول مفتوح<br>صدى العندليب V16</div>
-</div>
-
 <script>
-let appData={participants:{},winners:[]};
-let lastImageDataUrl="";
-
-function loadData(){
-    const d=localStorage.getItem('sadaAlAndaleeb_data');
-    if(d){ try{ appData=JSON.parse(d); }catch{} }
-    renderLeaderboard(); 
-    renderWinners();
-}
-
-function saveData(){
-    localStorage.setItem('sadaAlAndaleeb_data', JSON.stringify(appData));
-}
-
-function processMessages(){
-    const input=document.getElementById('messagesInput').value; 
-    if(!input.trim()) return alert('الصق الرسائل');
-    const re=/(?:الاسم|الإسم)\s*:\s*([^\n\r]+)/gi; 
-    let m,c=0;
-    while((m=re.exec(input))!==null){
-        let n=m[1].replace(/[\[\]\{\}\(\)\【\】]/g,'').trim(); 
-        if(n && !appData.participants.hasOwnProperty(n)){
-            appData.participants[n]=0;
-            c++;
-        }
-    }
-    saveData(); 
-    renderLeaderboard(); 
-    alert(`تم استخراج ${c} اسم - الإجمالي ${Object.keys(appData.participants).length} مفتوح`);
-}
-
-function addManualName(){
-    const n=document.getElementById('manualName').value.trim(); 
-    if(!n) return; 
-    if(!appData.participants.hasOwnProperty(n)){
-        appData.participants[n]=0; 
-        saveData(); 
-        renderLeaderboard(); 
-        document.getElementById('manualName').value='';
-    } else alert('الاسم موجود');
-}
-
-function processResults(){
-    const input=document.getElementById('resultsInput').value; 
-    if(!input.trim()) return alert('الصق النتائج'); 
-    if(!Object.keys(appData.participants).length) return alert('لا يوجد مشاركون');
-    
-    const lines=input.split('\n').filter(l=>l.trim()!==''); 
-    appData.winners=[]; 
-    const names=Object.keys(appData.participants);
-    
-    lines.forEach((line,idx)=>{
-        let matched=names.filter(n=>line.includes(n)); 
-        if(matched.length){
-            matched.forEach(w=>appData.participants[w]+=1); 
-            appData.winners.push({match:`مباراة ${idx+1}`,line:line.substring(0,80),winners:matched});
-        }
-    });
-    saveData(); 
-    renderLeaderboard(); 
-    renderWinners(); 
-    alert('تم الفرز');
-}
-
-function renderWinners(){
-    const c=document.getElementById('winnersList'), cc=document.getElementById('winnersCount'); 
-    cc.innerText=appData.winners.length;
-    if(!appData.winners.length){
-        c.innerHTML='<p style="text-align:center;color:#888">لا يوجد</p>';
-        return;
-    }
-    c.innerHTML=appData.winners.map(m=>`<div class="match-result"><b>${m.match}</b><br>الفائزون: ${m.winners.join(' ، ')}</div>`).join('');
-}
-
-function renderLeaderboard(){
-    const tbody=document.getElementById('leaderboardBody'), cs=document.getElementById('participantCount');
-    const sorted=Object.entries(appData.participants).sort((a,b)=>b[1]-a[1]);
-    cs.innerText=`${sorted.length} - مفتوح`;
-    
-    if(!sorted.length){
-        tbody.innerHTML='<tr><td colspan=4>لا يوجد</td></tr>';
-        return;
-    }
-    
-    // إضافة كلاس للصفوف لتسهيل فلترتها
-    tbody.innerHTML=sorted.map(([name,pts],i)=>`
-        <tr class="participant-row">
-            <td class="rank-cell">${i+1}</td>
-            <td class="name-cell">${name}</td>
-            <td><input type="number" value="${pts}" onchange="updatePoints('${name.replace(/'/g,"\\'")}',this.value)"></td>
-            <td><button class="delete-btn" onclick="deleteParticipant('${name.replace(/'/g,"\\'")}')">حذف</button></td>
-        </tr>
-    `).join('');
-}
-
-// --- دالة البحث والفلترة ---
-function filterTable() {
-    const searchText = document.getElementById('searchInput').value.toLowerCase();
-    const rows = document.querySelectorAll('.participant-row');
-
-    rows.forEach(row => {
-        const name = row.querySelector('.name-cell').innerText.toLowerCase();
-        if (name.includes(searchText)) {
-            row.style.display = ''; // إظهار الصف
-        } else {
-            row.style.display = 'none'; // إخفاء الصف
-        }
-    });
-}
-
-function updatePoints(n,v){
-    appData.participants[n]=parseInt(v)||0; 
-    saveData(); 
-    // تحديث الجدول وإعادة تطبيق الفلترة
-    renderLeaderboard();
-    filterTable(); 
-}
-
-function deleteParticipant(n){
-    if(confirm('حذف '+n+'؟')){
-        delete appData.participants[n]; 
-        saveData(); 
-        renderLeaderboard();
-        filterTable(); // إعادة تطبيق الفلترة بعد الحذف
-    }
-}
-
-function clearAllData(){
-    if(confirm('مسح الكل؟')){
-        appData={participants:{},winners:[]}; 
-        saveData(); 
-        renderLeaderboard(); 
-        renderWinners();
-        document.getElementById('searchInput').value=''; // مسح البحث
-    }
-}
-
-// --- صور ---
-function drawImage(title, headers, rows){
-    const canvas=document.getElementById('mainCanvas'); const ctx=canvas.getContext('2d');
-    const padding=20, rowH=40, headerH=60, titleH=70;
-    const colWidths=[50, 300, 80]; if(headers.length==2){colWidths=[80, 320];}
-    const width=colWidths.reduce((a,b)=>a+b,0)+padding*2;
-    const height=titleH+headerH+rows.length*rowH+padding*2+20;
-    canvas.width=width; canvas.height=height;
-    // خلفية
-    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,width,height);
-    // عنوان
-    ctx.fillStyle='#0b2e59'; ctx.fillRect(0,0,width,titleH);
-    ctx.fillStyle='#ffffff'; ctx.font='bold 22px Tahoma'; ctx.textAlign='center'; ctx.fillText('🏆 '+title, width/2, 30);
-    ctx.font='14px Tahoma'; ctx.fillText('صدى العندليب - V16', width/2, 50);
-    // هيدر جدول
-    let y=titleH+padding; let x=padding;
-    ctx.fillStyle='#0b2e59'; ctx.fillRect(padding, y, width-padding*2, rowH);
-    ctx.fillStyle='#fff'; ctx.font='bold 14px Tahoma'; ctx.textAlign='center';
-    headers.forEach((h,i)=>{ ctx.fillText(h, x+colWidths[i]/2, y+25); x+=colWidths[i]; });
-    y+=rowH;
-    // صفوف
-    rows.forEach((row, idx)=>{
-        ctx.fillStyle=idx%2==0?'#f4f7f6':'#ffffff'; ctx.fillRect(padding, y, width-padding*2, rowH);
-        ctx.fillStyle='#333'; ctx.font='13px Tahoma'; x=padding;
-        row.forEach((cell,i)=>{ ctx.fillText(cell.toString().substring(0,35), x+colWidths[i]/2, y+25); x+=colWidths[i]; });
-        y+=rowH;
-    });
-    ctx.strokeStyle='#0b2e59'; ctx.lineWidth=2; ctx.strokeRect(padding, titleH+padding, width-padding*2, headerH+rows.length*rowH-rowH+headerH);
-    const dataUrl=canvas.toDataURL('image/png');
-    lastImageDataUrl=dataUrl;
-    document.getElementById('canvasPreview').src=dataUrl; document.getElementById('canvasPreview').style.display='block';
-    document.getElementById('imageActions').style.display='flex';
-    document.getElementById('canvasPreview').scrollIntoView({behavior:'smooth'});
-}
-
-function generateWinnersImage(){
-    if(!appData.winners.length) return alert('لا يوجد فائزون');
-    const rows=[]; appData.winners.forEach((m,i)=>{ rows.push([i+1, m.winners.join(' ، ')]); });
-    drawImage('المتوقعين الصح', ['#','اسماء الفائزين'], rows);
-}
-
-function generateTableImage(){
-    const sorted=Object.entries(appData.participants).sort((a,b)=>b[1]-a[1]);
-    if(!sorted.length) return alert('لا يوجد مشاركون');
-    const rows=sorted.map(([name,pts],i)=>[i+1, name, pts]);
-    drawImage('الترتيب العام', ['#','الاسم','النقاط'], rows);
-}
-
-function downloadImage(){
-    if(!lastImageDataUrl) return; const a=document.createElement('a'); a.href=lastImageDataUrl; a.download='sada_alandalib.png'; a.click();
-}
-
-async function shareImageWhatsApp(){
-    if(!lastImageDataUrl) return;
-    try{
-        const res=await fetch(lastImageDataUrl); const blob=await res.blob();
-        const file=new File([blob], 'sada.png', {type:'image/png'});
-        if(navigator.canShare && navigator.canShare({files:[file]})){
-            await navigator.share({files:[file], title:'صدى العندليب', text:'كشف صدى العندليب V16'});
-        } else {
-            downloadImage(); alert('تم تحميل الصورة - الآن تقدر ترسلها في الواتساب من الاستوديو');
-            window.open('https://wa.me/?text='+encodeURIComponent('كشف صدى العندليب V16 - الصورة في الاستوديو'),'_blank');
-        }
-    }catch(e){ downloadImage(); alert('تم تحميل الصورة - أرسلها عبر الواتساب'); }
-}
-
-function shareWinnersWhatsApp(){
-    if(!appData.winners.length) return alert('لا يوجد');
-    let txt='🏆 *المتوقعين الصح - صدى العندليب*%0A%0A';
-    appData.winners.forEach(m=>{ txt+=`*${m.match}*: ${m.winners.join(' ، ')}%0A`; });
-    window.open('https://wa.me/?text='+txt,'_blank');
-}
-
-function shareTableWhatsApp(){
-    const sorted=Object.entries(appData.participants).sort((a,b)=>b[1]-a[1]);
-    let txt='👑 *الترتيب العام - صدى العندليب V16*%0A%0A';
-    sorted.forEach(([n,p],i)=>{ txt+=`${i+1}. ${n} - ${p} نقاط%0A`; });
-    window.open('https://wa.me/?text='+txt,'_blank');
-}
-
-function exportBackup(){
-    const dataStr=JSON.stringify(appData); const blob=new Blob([dataStr],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_sada_v16.json'; a.click();
-}
-
-function importBackup(e){
-    const file=e.target.files[0]; if(!file) return;
-    const r=new FileReader(); r.onload=function(ev){ try{ appData=JSON.parse(ev.target.result); saveData(); renderLeaderboard(); renderWinners(); alert('تم استيراد النسخة'); }catch{alert('ملف غير صحيح');}}; r.readAsText(file);
-}
-
-window.onload=loadData;
+let autoEnabled=true; let lastImg='';
+function saveAuto(){localStorage.setItem('sada_correct',document.getElementById('correctBox').value);localStorage.setItem('sada_subs',document.getElementById('subsBox').value);}
+function loadAuto(){document.getElementById('correctBox').value=localStorage.getItem('sada_correct')||'';document.getElementById('subsBox').value=localStorage.getItem('sada_subs')||'';updateCounts();if(document.getElementById('subsBox').value.trim()&&document.getElementById('correctBox').value.trim()){setTimeout(sortWinners,500);}}
+function toggleAuto(){autoEnabled=!autoEnabled;document.getElementById('toggleAuto').innerText=autoEnabled?'⏸️ إيقاف تلقائي':'▶️ تفعيل تلقائي';}
+function extractScores(text){const regex=/\[[\s]*([0-9٠-٩]+)[\s]*\]/g;let out=[];let m;while((m=regex.exec(text))!==null){let num=m[1].trim();const ar='٠١٢٣٤٥٦٧٨٩';const en='0123456789';let conv='';for(let c of num){let idx=ar.indexOf(c);conv+=idx>=0?en[idx]:c;}if(conv)out.push(conv);}return out;}
+function extractName(block){let n=block.match(/الإسم:\s*([^\n🔥]+)/);if(n)return n[1].trim();let lines=block.trim().split('\n').filter(l=>l.trim()&&!l.includes('[')&&!l.includes('تحدي'));return lines[lines.length-1]?.substring(0,30).replace(/[*_]/g,'').trim()||'بدون اسم';}
+function updateCounts(){const subsText=document.getElementById('subsBox').value.trim();let blocks=subsText.split(/\n\s*\n/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/🔥/).filter(b=>b.trim().length>5);if(subsText&&blocks.length<=1&&subsText.length>20)blocks=[subsText];if(!subsText)blocks=[];document.getElementById('total').innerText=blocks.length+' مشترك';const correct=extractScores(document.getElementById('correctBox').value);document.getElementById('matchCount').innerText=Math.floor(correct.length/2)+' مباراة ('+correct.length+' توقع)';}
+function sortWinners(){saveAuto();updateCounts();const correctBox=document.getElementById('correctBox').value.trim();const subsText=document.getElementById('subsBox').value.trim();const mode=document.getElementById('mode').value;if(!correctBox||!subsText)return;const correct=extractScores(correctBox);if(correct.length===0)return;let blocks=subsText.split(/\n\s*\n/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/🔥/).filter(b=>b.trim().length>5);if(blocks.length<2)blocks=subsText.split(/الإسم:/).filter(b=>b.trim().length>5).map(b=>'الإسم:'+b);let rows=[];blocks.forEach(block=>{const scores=extractScores(block);if(scores.length===0)return;let matchCount=0;const limit=Math.min(scores.length,correct.length);for(let i=0;i<limit;i++){if(scores[i]===correct[i])matchCount++;}let isWin=false;if(mode==='all')isWin=matchCount===correct.length&&scores.length>=correct.length;else if(mode==='most')isWin=matchCount>=Math.ceil(correct.length/2);else isWin=matchCount>=1;if(isWin){rows.push({name:extractName(block),scores:scores.join('-'),matchCount,total:correct.length});}});const tbody=document.getElementById('tbody');if(rows.length===0){tbody.innerHTML='<tr><td colspan="4">لا يوجد فائزين 100% - جرب (نصف المباريات)</td></tr>';}else{tbody.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td>${r.scores}</td><td>${r.matchCount}/${r.total}</td></tr>`).join('');}document.getElementById('win').innerText=rows.length+' فائز (عرض الكل)';document.getElementById('info').innerText='✅ تم فرز '+blocks.length+' مشترك - وجدنا '+rows.length+' فائز - عرض الكل';}
+function shareWA(){const table=document.getElementById('table').innerText;window.open('https://wa.me/?text='+encodeURIComponent('🏆 كشف الفائزين - صدى العندليب ('+document.getElementById('win').innerText+')\n'+document.getElementById('info').innerText+'\n\n'+table),'_blank');}
+function makeImage(){const table=document.getElementById('table');const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');canvas.width=650;canvas.height=100+table.rows.length*32;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#0b2e59';ctx.fillRect(0,0,canvas.width,60);ctx.fillStyle='#fff';ctx.font='bold 18px Tahoma';ctx.textAlign='center';ctx.fillText('🏆 كشف الفائزين - صدى العندليب - '+document.getElementById('win').innerText,325,38);let y=85;ctx.fillStyle='#222';ctx.font='13px Tahoma';ctx.textAlign='right';for(let r of table.rows){let txt='';for(let c of r.cells)txt+=c.innerText+' | ';ctx.fillText(txt,630,y);y+=30;}lastImg=canvas.toDataURL('image/png');document.getElementById('preview').src=lastImg;document.getElementById('preview').style.display='block';}
+document.getElementById('correctBox').addEventListener('input',()=>{saveAuto();updateCounts();if(autoEnabled)sortWinners();});
+document.getElementById('subsBox').addEventListener('paste',()=>{document.getElementById('info').innerText='⏳ جاري اللصق والفرز...';setTimeout(()=>{saveAuto();updateCounts();if(autoEnabled)sortWinners();},600);});
+document.getElementById('subsBox').addEventListener('input',()=>{saveAuto();updateCounts();if(autoEnabled&&document.getElementById('subsBox').value.length>30){clearTimeout(window._t);window._t=setTimeout(sortWinners,800);}});
+document.getElementById('mode').addEventListener('change',sortWinners);
+loadAuto();
 </script>
 </body>
 </html>
