@@ -198,64 +198,47 @@ return clean(s)
 }
 
 // ==========================================
-// 🔴 التعديل الجوهري هنا: دالة فصل المشتركين
+// 🔴 دالة الفصل الجديدة (تعتمد على نهاية سطر الاسم)
 // ==========================================
-function splitParticipants(text){
-    text=stripBidi(text).replace(/\r/g,'');
-    if(!text.trim()) return [];
+function splitParticipants(text) {
+    text = stripBidi(text).replace(/\r/g, '');
+    if (!text.trim()) return [];
 
-    // البحث عن كلمة "الاسم" أو "الأسم" أو "الإسم" في أي مكان
-    // ثم أخذ النص بعد النقطتين حتى نهاية السطر
-    const nameRegex = /(?:الأسم|الاسم|الإسم)\s*:\s*([^\n]+)/g;
-    let matches = [...text.matchAll(nameRegex)];
+    const blocks = [];
+    let currentBlock = [];
+    const lines = text.split('\n');
 
-    if (matches.length > 0) {
-        const blocks = [];
-        let currentStart = 0;
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        currentBlock.push(line);
 
-        for (let i = 0; i < matches.length; i++) {
-            let match = matches[i];
-            // نهاية الرسالة الحالية هي نهاية سطر الاسم
-            let currentEnd = match.index + match[0].length;
-            
-            // إذا كانت هذه ليست أول رسالة، نبدأ من النص الذي يلي الرسالة السابقة
-            let blockText = text.slice(currentStart, currentEnd).trim();
-            if (blockText) {
-                blocks.push(blockText);
+        // إذا وجدنا سطر يحتوي على كلمة "الأسم" أو "الاسم" أو "الإسم"
+        if (/(?:الأسم|الاسم|الإسم)\s*[:：]/i.test(line)) {
+            // إذا كان هذا هو أول سطر في الكتلة وكان مجرد عنوان، لا نقطعه
+            if (currentBlock.length > 1 || i === lines.length - 1) {
+                blocks.push(currentBlock.join('\n').trim());
+                currentBlock = []; // تصفير الكتلة للبدء في الرسالة التالية
             }
-            
-            // بداية الرسالة التالية تبدأ من بعد سطر الاسم الحالي
-            currentStart = currentEnd;
         }
-        
-        // التقاط أي نص متبقٍ بعد آخر اسم (إن وجد)
-        let remaining = text.slice(currentStart).trim();
-        if (remaining && /[\[\]【】〔〕(){}]/.test(remaining)) {
-            blocks.push(remaining);
-        }
-        return blocks;
     }
 
-    // خطة بديلة في حال عدم وجود اسم
-    return [text.trim()];
+    // إذا تبقى شيء في الكتلة الأخيرة ولم يتم إضافته
+    if (currentBlock.length > 0) {
+        let remaining = currentBlock.join('\n').trim();
+        if (remaining.length > 0) {
+            blocks.push(remaining);
+        }
+    }
+
+    return blocks;
 }
 
 function extractName(block,i){
     const b=stripBidi(block);
-    
-    // البحث عن الاسم المكتوب داخل الكليشة
-    let m=b.match(/(?:الإسم|الاسم|الأسم)\s*[:：]\s*([^*\n\r]+)/i);
+    let m=b.match(/(?:الإسم|الاسم|الأسم)\s*[:：]\s*([^\n]+)/i);
     if(m && m[1].trim()){
         return m[1].replace(/[*_.،]+$/g,'').trim().slice(0,70);
     }
-
-    // محاولة قراءة الاسم من أول سطر إذا كان بصيغة واتساب
-    const first=b.split('\n')[0];
-    let m2=first.match(/^\s*\[\s*[^\]]+\]\s*(.*?)\s*[:：]\s*$/);
-    if(m2 && m2[1].trim()){
-        return m2[1].trim().slice(0,70);
-    }
-
     return 'مشارك '+(i+1);
 }
 
@@ -287,8 +270,7 @@ function parsePenaltyWinners(text){
     const out=[];
     const patterns=[
         /(?:فوز|فاز)\s+(?:فريق\s+)?([^\n*\[\]،؛]+?)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح|ضربات\s+الجزاء)/gi,
-        /([^\n*\[\]،؛]+?)\s+(?:يفوز|فاز)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح)/gi,
-        /(?:الفائز|الفريق\s+الفائز)\s*[:：-]\s*(?:فريق\s+)?([^\n*\[\]،؛]+)/gi
+        /([^\n*\[\]،؛]+?)\s+(?:يفوز|فاز)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح)/gi
     ];
     for(const re of patterns){
         let m;
