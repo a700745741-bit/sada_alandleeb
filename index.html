@@ -40,18 +40,18 @@ body{max-width:1000px;margin:auto}
 
 <div class="header">
 <h2>🔥 صدى العندليب</h2>
-<p>فرز عام للتوقعات — رسائل واتساب متلاصقة — نتائج كاملة أو مباريات لم تُلعب بعد</p>
+<p>فرز عام للتوقعات — رسائل متلاصقة — نتائج كاملة أو مباريات لم تُلعب بعد</p>
 </div>
 
 <div class="two">
 <section class="card">
 <label>📋 القسم الأول: الصق رسائل توقعات المشاركين</label>
-<textarea id="allBox" rows="15" placeholder="الصق هنا رسائل واتساب المتتالية، 78 أو 200 رسالة أو أكثر..."></textarea>
+<textarea id="allBox" rows="15" placeholder="الصق هنا رسائل توقعات المشاركين المتتالية، 80 أو 200 رسالة أو أكثر..."></textarea>
 <div class="badges">
 <span class="badge" id="participants">0 مشارك</span>
 <span class="badge" id="parsedCount">0 توقع مقروء</span>
 </div>
-<p class="help">يدعم رسائل واتساب التي تبدأ بالتاريخ والوقت ثم اسم المرسل أو رقمه، وبعد ذلك كليشة التوقع. كل رسالة مستقلة تُعامل كمشارك.</p>
+<p class="help">البرنامج ذكي ويتعرف تلقائياً على نهاية كل كليشة عند رؤية كلمة "الاسم :" أو "الأسم :" في السطر الأخير.</p>
 </section>
 
 <section class="card green">
@@ -197,599 +197,484 @@ return clean(s)
 .replace(/\s+/g,' ').trim();
 }
 
-// التعرف على رؤوس رسائل واتساب
-function headerStarts(text){
-text=stripBidi(text).replace(/\r/g,'');
-const d='[0-9٠-٩۰-۹]{1,2}[/.\\-][0-9٠-٩۰-۹]{1,2}(?:[/.\\-][0-9٠-٩۰-۹]{2,4})?';
-const t='[0-9٠-٩۰-۹]{1,2}:[0-9٠-٩۰-۹]{2}(?:\\s*(?:ص|م|صباحا|مساءً?|AM|PM))?';
-
-const re=new RegExp(
-'^[\\t ]*(?:\\[\\s*)?'+d+
-'(?:\\s*(?:،|,)\\s*|\\s+)'+t+
-'[^\\n]*?(?:\\])?[^\\n]{0,100}(?:-|–|—|：|:)\\s*[^\\n]*$',
-'gim'
-);
-
-const starts=[];
-let m;
-
-while((m=re.exec(text))!==null){
-const line=m[0];
-const dateTime=new RegExp(
-'^\\s*(?:\\[\\s*)?'+d+
-'(?:\\s*(?:،|,)\\s*|\\s+)'+t,'i'
-);
-const tail=line.replace(dateTime,'').replace(/^\\s*\\]?\\s*/,'').trim();
-
-if(tail.length>1 && /[:：]|[-–—]/.test(tail)){
-starts.push(m.index);
-}
-}
-return [...new Set(starts)];
-}
-
-// فصل المشاركين
+// ==========================================
+// 🔴 التعديل الجوهري هنا: دالة فصل المشتركين
+// ==========================================
 function splitParticipants(text){
-text=stripBidi(text).replace(/\r/g,'');
-if(!text.trim())return [];
+    text=stripBidi(text).replace(/\r/g,'');
+    if(!text.trim()) return [];
 
-const starts=headerStarts(text);
+    // البحث عن كلمة "الاسم" أو "الأسم" أو "الإسم" في أي مكان
+    // ثم أخذ النص بعد النقطتين حتى نهاية السطر
+    const nameRegex = /(?:الأسم|الاسم|الإسم)\s*:\s*([^\n]+)/g;
+    let matches = [...text.matchAll(nameRegex)];
 
-if(starts.length){
-const blocks=[];
+    if (matches.length > 0) {
+        const blocks = [];
+        let currentStart = 0;
 
-for(let i=0;i<starts.length;i++){
-const start=starts[i];
-const end=i+1<starts.length?starts[i+1]:text.length;
-const b=text.slice(start,end).trim();
-if(b)blocks.push(b);
+        for (let i = 0; i < matches.length; i++) {
+            let match = matches[i];
+            // نهاية الرسالة الحالية هي نهاية سطر الاسم
+            let currentEnd = match.index + match[0].length;
+            
+            // إذا كانت هذه ليست أول رسالة، نبدأ من النص الذي يلي الرسالة السابقة
+            let blockText = text.slice(currentStart, currentEnd).trim();
+            if (blockText) {
+                blocks.push(blockText);
+            }
+            
+            // بداية الرسالة التالية تبدأ من بعد سطر الاسم الحالي
+            currentStart = currentEnd;
+        }
+        
+        // التقاط أي نص متبقٍ بعد آخر اسم (إن وجد)
+        let remaining = text.slice(currentStart).trim();
+        if (remaining && /[\[\]【】〔〕(){}]/.test(remaining)) {
+            blocks.push(remaining);
+        }
+        return blocks;
+    }
+
+    // خطة بديلة في حال عدم وجود اسم
+    return [text.trim()];
 }
 
-const before=text.slice(0,starts[0]).trim();
-if(before && /[\[\]【】〔〕(){}]/.test(before)){
-blocks.unshift(before);
-}
-return blocks;
-}
-
-// بديل عند عدم وجود رؤوس واتساب
-const re=/(?:^|\n)[ \t]*\*?[ \t]*(?:الإسم|الاسم|الأسم|اسم\s*المشارك|اسم\s*المتسابق|اسم\s*المتوقع)[ \t]*[:：]/g;
-const cuts=[...text.matchAll(re)].map(m=>m.index+(m[0].startsWith('\n')?1:0));
-
-if(cuts.length){
-const blocks=[];
-let pos=0;
-
-for(const c of cuts){
-if(c>pos){
-const b=text.slice(pos,c).trim();
-if(b)blocks.push(b);
-}
-pos=c;
-}
-
-if(pos<text.length){
-const b=text.slice(pos).trim();
-if(b)blocks.push(b);
-}
-
-return blocks.filter(b=>parseBlock(b).matches.length>0);
-}
-
-return [text.trim()];
-}
-
-// استخراج اسم المرسل أو الرقم
 function extractName(block,i){
-const b=stripBidi(block);
-const first=b.split('\n')[0];
+    const b=stripBidi(block);
+    
+    // البحث عن الاسم المكتوب داخل الكليشة
+    let m=b.match(/(?:الإسم|الاسم|الأسم)\s*[:：]\s*([^*\n\r]+)/i);
+    if(m && m[1].trim()){
+        return m[1].replace(/[*_.،]+$/g,'').trim().slice(0,70);
+    }
 
-// صيغة واتساب المحاطة بأقواس
-let m=first.match(/^\s*\[\s*[^\]]+\]\s*(.*?)\s*[:：]\s*$/);
+    // محاولة قراءة الاسم من أول سطر إذا كان بصيغة واتساب
+    const first=b.split('\n')[0];
+    let m2=first.match(/^\s*\[\s*[^\]]+\]\s*(.*?)\s*[:：]\s*$/);
+    if(m2 && m2[1].trim()){
+        return m2[1].trim().slice(0,70);
+    }
 
-if(m && m[1].trim()){
-return m[1].trim().slice(0,70);
+    return 'مشارك '+(i+1);
 }
 
-// صيغة واتساب دون أقواس
-m=first.match(/^\s*[0-9٠-٩۰-۹]{1,2}[/. -][0-9٠-٩۰-۹]{1,2}(?:[/. -][0-9٠-٩۰-۹]{2,4})?\s*(?:،|,)?\s*[0-9٠-٩۰-۹]{1,2}:[0-9٠-٩۰-۹]{2}(?:\s*(?:ص|م|AM|PM))?\s*[-–—]\s*(.*?)\s*[:：]\s*$/i);
-
-if(m && m[1].trim()){
-return m[1].trim().slice(0,70);
-}
-
-// الاسم المكتوب داخل كليشة التوقع
-m=b.match(/(?:الإسم|الاسم|الأسم|اسم\s*المشارك|اسم\s*المتسابق|اسم\s*المتوقع)\s*[:：]\s*([^*\n\r]+)/i);
-
-if(m && m[1].trim()){
-return m[1].replace(/[*_.،]+$/g,'').trim().slice(0,70);
-}
-
-return 'مشارك '+(i+1);
-}
-
-// قراءة الفريق والنتيجة من مختلف الأقواس
 function readScoreLine(line){
-let s=stripBidi(line).trim();
-if(!s)return null;
-
-s=s.replace(/[*_~`]/g,'').trim();
-
-const left=/^\s*(.+?)\s*[\[【〔（(]\s*([0-9٠-٩۰-۹]*)\s*[\]】〕）)]\s*$/;
-const right=/^\s*[\[【〔（(]\s*([0-9٠-٩۰-۹]*)\s*[\]】〕）)]\s*(.+?)\s*$/;
-
-let m=s.match(left),team,score;
-
-if(m){
-team=m[1];
-score=digits(m[2]);
-}else{
-m=s.match(right);
-if(!m)return null;
-score=digits(m[1]);
-team=m[2];
-}
-
-team=team.trim();
-
-if(!team || team.length>90)return null;
-
-return {
-team,
-score:score===''?null:Number(score)
-};
+    let s=stripBidi(line).trim();
+    if(!s)return null;
+    s=s.replace(/[*_~`]/g,'').trim();
+    const left=/^\s*(.+?)\s*[\[【〔（(]\s*([0-9٠-٩۰-۹]*)\s*[\]】〕）)]\s*$/;
+    const right=/^\s*[\[【〔（(]\s*([0-9٠-٩۰-۹]*)\s*[\]】〕）)]\s*(.+?)\s*$/;
+    let m=s.match(left),team,score;
+    if(m){
+        team=m[1];
+        score=digits(m[2]);
+    }else{
+        m=s.match(right);
+        if(!m)return null;
+        score=digits(m[1]);
+        team=m[2];
+    }
+    team=team.trim();
+    if(!team || team.length>90)return null;
+    return {
+        team,
+        score:score===''?null:Number(score)
+    };
 }
 
 function parsePenaltyWinners(text){
-const out=[];
-const patterns=[
-/(?:فوز|فاز)\s+(?:فريق\s+)?([^\n*\[\]،؛]+?)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح|ضربات\s+الجزاء)/gi,
-/([^\n*\[\]،؛]+?)\s+(?:يفوز|فاز)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح)/gi,
-/(?:الفائز|الفريق\s+الفائز)\s*[:：-]\s*(?:فريق\s+)?([^\n*\[\]،؛]+)/gi
-];
-
-for(const re of patterns){
-let m;
-while((m=re.exec(text))!==null){
-let winner=m[1].trim().replace(/^(?:فريق)\s+/,'');
-if(winner.length>1 && !out.some(x=>normTeam(x)===normTeam(winner))){
-out.push(winner);
-}
-}
-}
-return out;
+    const out=[];
+    const patterns=[
+        /(?:فوز|فاز)\s+(?:فريق\s+)?([^\n*\[\]،؛]+?)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح|ضربات\s+الجزاء)/gi,
+        /([^\n*\[\]،؛]+?)\s+(?:يفوز|فاز)\s+(?:بضربات\s+الجزاء|بركلات\s+الترجيح|بركلات\s+الجزاء|بالترجيح)/gi,
+        /(?:الفائز|الفريق\s+الفائز)\s*[:：-]\s*(?:فريق\s+)?([^\n*\[\]،؛]+)/gi
+    ];
+    for(const re of patterns){
+        let m;
+        while((m=re.exec(text))!==null){
+            let winner=m[1].trim().replace(/^(?:فريق)\s+/,'');
+            if(winner.length>1 && !out.some(x=>normTeam(x)===normTeam(winner))){
+                out.push(winner);
+            }
+        }
+    }
+    return out;
 }
 
 function parseBlock(block){
-const lines=block.split('\n');
-const teams=[];
-
-for(const line of lines){
-const x=readScoreLine(line);
-if(x)teams.push(x);
-}
-
-const matches=[];
-
-for(let i=0;i+1<teams.length;i+=2){
-matches.push({
-a:teams[i],
-b:teams[i+1],
-index:matches.length,
-penaltyWinner:null
-});
-}
-
-const penaltyWinners=parsePenaltyWinners(block);
-let pi=0;
-
-for(const mt of matches){
-if(mt.a.score!==null && mt.b.score!==null &&
-mt.a.score===mt.b.score && pi<penaltyWinners.length){
-mt.penaltyWinner=penaltyWinners[pi++];
-}
-}
-
-return {teams,matches};
+    const lines=block.split('\n');
+    const teams=[];
+    for(const line of lines){
+        const x=readScoreLine(line);
+        if(x)teams.push(x);
+    }
+    const matches=[];
+    for(let i=0;i+1<teams.length;i+=2){
+        matches.push({
+            a:teams[i],
+            b:teams[i+1],
+            index:matches.length,
+            penaltyWinner:null
+        });
+    }
+    const penaltyWinners=parsePenaltyWinners(block);
+    let pi=0;
+    for(const mt of matches){
+        if(mt.a.score!==null && mt.b.score!==null &&
+        mt.a.score===mt.b.score && pi<penaltyWinners.length){
+            mt.penaltyWinner=penaltyWinners[pi++];
+        }
+    }
+    return {teams,matches};
 }
 
 function resultKnown(m){
-return m && m.a.score!==null && m.b.score!==null;
+    return m && m.a.score!==null && m.b.score!==null;
 }
 
 function teamSim(a,b){
-const x=normTeam(a),y=normTeam(b);
-return x===y || (x.length>=4 && y.length>=4 && (x.includes(y)||y.includes(x)));
+    const x=normTeam(a),y=normTeam(b);
+    return x===y || (x.length>=4 && y.length>=4 && (x.includes(y)||y.includes(x)));
 }
 
 function parseCorrect(text){
-return parseBlock(text).matches.map((m,i)=>({...m,index:i}));
+    return parseBlock(text).matches.map((m,i)=>({...m,index:i}));
 }
 
 function parseAll(){
-return splitParticipants($('allBox').value).map((block,i)=>({
-block,
-name:extractName(block,i),
-...parseBlock(block),
-i
-}));
+    const rawText = $('allBox').value;
+    const blocks = splitParticipants(rawText);
+    return blocks.map((block,i)=>({
+        block,
+        name:extractName(block,i),
+        ...parseBlock(block),
+        i
+    }));
 }
 
 function matchParticipantGame(p,cm,mode,used){
-if(mode==='order'){
-return p.matches[cm.index] || null;
-}
-
-for(const pm of p.matches){
-if(used.has(pm.index))continue;
-
-const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
-const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
-
-if(direct||reverse)return pm;
-}
-return null;
+    if(mode==='order'){
+        return p.matches[cm.index] || null;
+    }
+    for(const pm of p.matches){
+        if(used.has(pm.index))continue;
+        const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
+        const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
+        if(direct||reverse)return pm;
+    }
+    return null;
 }
 
 function isCorrect(pm,cm){
-if(!pm || !resultKnown(pm) || !resultKnown(cm))return false;
-
-const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
-const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
-
-let scoresMatch=false;
-
-if(direct){
-scoresMatch=pm.a.score===cm.a.score && pm.b.score===cm.b.score;
-}else if(reverse){
-scoresMatch=pm.a.score===cm.b.score && pm.b.score===cm.a.score;
-}
-
-if(!scoresMatch)return false;
-
-if(cm.penaltyWinner){
-if(!pm.penaltyWinner)return false;
-return teamSim(pm.penaltyWinner,cm.penaltyWinner);
-}
-
-return true;
+    if(!pm || !resultKnown(pm) || !resultKnown(cm))return false;
+    const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
+    const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
+    let scoresMatch=false;
+    if(direct){
+        scoresMatch=pm.a.score===cm.a.score && pm.b.score===cm.b.score;
+    }else if(reverse){
+        scoresMatch=pm.a.score===cm.b.score && pm.b.score===cm.a.score;
+    }
+    if(!scoresMatch)return false;
+    if(cm.penaltyWinner){
+        if(!pm.penaltyWinner)return false;
+        return teamSim(pm.penaltyWinner,cm.penaltyWinner);
+    }
+    return true;
 }
 
 function esc(s){
-return String(s).replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[c]));
+    return String(s).replace(/[&<>"']/g,c=>({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
 }
 
 function runSort(){
-const people=parseAll();
-const correct=parseCorrect($('correctBox').value);
-const mode=$('matchMode').value;
-const show=$('showMode').value;
+    const people=parseAll();
+    const correct=parseCorrect($('correctBox').value);
+    const mode=$('matchMode').value;
+    const show=$('showMode').value;
 
-lastCorrect=correct;
+    lastCorrect=correct;
+    const known=correct.filter(resultKnown);
 
-const known=correct.filter(resultKnown);
+    if(!people.length){
+        alert('الصق رسائل المشاركين أولاً.');
+        return;
+    }
 
-if(!people.length){
-alert('الصق رسائل المشاركين أولاً.');
-return;
-}
+    if(!known.length){
+        alert('لم أجد مباراة مكتملة في كليشة النتائج. أدخل نتيجتي الفريقين للمباراة المكتملة.');
+        return;
+    }
 
-if(!known.length){
-alert('لم أجد مباراة مكتملة في كليشة النتائج. أدخل نتيجتي الفريقين للمباراة المكتملة.');
-return;
-}
+    const pointValue=Math.max(0,Number($('pointsPerMatch').value)||0);
 
-const pointValue=Math.max(0,Number($('pointsPerMatch').value)||0);
+    const counts=people.map(p=>{
+        let hits=0;
+        let used=new Set();
+        correct.forEach(cm=>{
+            if(!resultKnown(cm))return;
+            const pm=matchParticipantGame(p,cm,mode,used);
+            if(pm)used.add(pm.index);
+            if(isCorrect(pm,cm))hits++;
+        });
+        return {
+            ...p,
+            hits,
+            score:hits*pointValue,
+            total:known.length
+        };
+    });
 
-const counts=people.map(p=>{
-let hits=0;
-let used=new Set();
+    let filtered=counts.filter(p=>{
+        if(show==='perfect')return p.hits===known.length;
+        if(show==='one')return p.hits>=1;
+        return true;
+    });
 
-correct.forEach(cm=>{
-if(!resultKnown(cm))return;
+    filtered.sort((a,b)=>b.score-a.score || a.name.localeCompare(b.name,'ar'));
 
-const pm=matchParticipantGame(p,cm,mode,used);
-if(pm)used.add(pm.index);
+    lastSummary=correct.map(cm=>{
+        if(!resultKnown(cm)){
+            return {
+                index:cm.index+1,
+                match:cm.a.team+' × '+cm.b.team,
+                result:'لم تُلعب / غير مكتملة',
+                names:[]
+            };
+        }
+        const names=[];
+        for(const p of counts){
+            const pm=matchParticipantGame(p,cm,mode,new Set());
+            if(isCorrect(pm,cm))names.push(p.name);
+        }
+        return {
+            index:cm.index+1,
+            match:cm.a.team+' × '+cm.b.team,
+            result:cm.a.score+' - '+cm.b.score,
+            names
+        };
+    });
 
-if(isCorrect(pm,cm))hits++;
-});
+    lastPerfect=counts.filter(p=>p.hits===known.length)
+    .sort((a,b)=>a.name.localeCompare(b.name,'ar'));
 
-return {
-...p,
-hits,
-score:hits*pointValue,
-total:known.length
-};
-});
+    lastRank=filtered;
+    lastPeople=people;
+    lastKnown=known;
 
-let filtered=counts.filter(p=>{
-if(show==='perfect')return p.hits===known.length;
-if(show==='one')return p.hits>=1;
-return true;
-});
+    $('rankBody').innerHTML=lastRank.map((p,i)=>
+    `<tr><td class="center">${i+1}</td><td>${esc(p.name)}</td><td class="center">${p.hits}/${p.total}</td><td class="center"><b>${p.score}</b></td></tr>`
+    ).join('');
 
-filtered.sort((a,b)=>b.score-a.score || a.name.localeCompare(b.name,'ar'));
+    $('liveMatch').innerHTML=correct.map((m,i)=>
+    `<option value="${i}">${esc(m.a.team)} × ${esc(m.b.team)}${resultKnown(m)?' ('+m.a.score+'-'+m.b.score+')':' — غير مكتملة'}</option>`
+    ).join('');
 
-lastSummary=correct.map(cm=>{
-if(!resultKnown(cm)){
-return {
-index:cm.index+1,
-match:cm.a.team+' × '+cm.b.team,
-result:'لم تُلعب / غير مكتملة',
-names:[]
-};
-}
+    $('participants').textContent=people.length+' مشارك';
+    $('parsedCount').textContent=people.filter(p=>p.matches.length).length+' توقع مقروء';
+    $('matchCount').textContent=known.length+' مباراة مكتملة';
+    $('winnersCount').textContent=lastSummary.filter(x=>x.names.length).length+' مباراة لها مطابقون';
 
-const names=[];
+    $('status').textContent=
+    `تمت قراءة ${people.length} رسالة/مشارك. قرأ البرنامج توقعات ${people.filter(p=>p.matches.length).length} مشاركًا، واحتسب ${known.length} مباراة مكتملة.`;
 
-for(const p of counts){
-const pm=matchParticipantGame(p,cm,mode,new Set());
-if(isCorrect(pm,cm))names.push(p.name);
-}
+    $('summaryBody').innerHTML=lastSummary.map(r=>
+    `<tr><td class="center">${r.index}</td><td>${esc(r.match)}</td><td class="center">${esc(r.result)}</td><td>${r.names.length?r.names.map(esc).join('، '):'لا أحد حتى الآن'}</td><td class="center">${r.names.length}</td></tr>`
+    ).join('');
 
-return {
-index:cm.index+1,
-match:cm.a.team+' × '+cm.b.team,
-result:cm.a.score+' - '+cm.b.score,
-names
-};
-});
+    $('perfectList').innerHTML=lastPerfect.length?
+    `<p>عدد أصحاب التوقع الكامل: <b>${lastPerfect.length}</b></p><ol>${lastPerfect.map(p=>`<li>${esc(p.name)} — ${p.hits}/${p.total}</li>`).join('')}</ol>`:
+    'لا يوجد من أصاب جميع النتائج المكتملة حتى الآن.';
 
-lastPerfect=counts.filter(p=>p.hits===known.length)
-.sort((a,b)=>a.name.localeCompare(b.name,'ar'));
-
-lastRank=filtered;
-lastPeople=people;
-lastKnown=known;
-
-$('rankBody').innerHTML=lastRank.map((p,i)=>
-`<tr><td class="center">${i+1}</td><td>${esc(p.name)}</td><td class="center">${p.hits}/${p.total}</td><td class="center"><b>${p.score}</b></td></tr>`
-).join('');
-
-$('liveMatch').innerHTML=correct.map((m,i)=>
-`<option value="${i}">${esc(m.a.team)} × ${esc(m.b.team)}${resultKnown(m)?' ('+m.a.score+'-'+m.b.score+')':' — غير مكتملة'}</option>`
-).join('');
-
-$('participants').textContent=people.length+' مشارك';
-$('parsedCount').textContent=people.filter(p=>p.matches.length).length+' توقع مقروء';
-$('matchCount').textContent=known.length+' مباراة مكتملة';
-$('winnersCount').textContent=lastSummary.filter(x=>x.names.length).length+' مباراة لها مطابقون';
-
-$('status').textContent=
-`تمت قراءة ${people.length} رسالة/مشارك. قرأ البرنامج توقعات ${people.filter(p=>p.matches.length).length} مشاركًا، واحتسب ${known.length} مباراة مكتملة.`;
-
-$('summaryBody').innerHTML=lastSummary.map(r=>
-`<tr><td class="center">${r.index}</td><td>${esc(r.match)}</td><td class="center">${esc(r.result)}</td><td>${r.names.length?r.names.map(esc).join('، '):'لا أحد حتى الآن'}</td><td class="center">${r.names.length}</td></tr>`
-).join('');
-
-$('perfectList').innerHTML=lastPerfect.length?
-`<p>عدد أصحاب التوقع الكامل: <b>${lastPerfect.length}</b></p><ol>${lastPerfect.map(p=>`<li>${esc(p.name)} — ${p.hits}/${p.total}</li>`).join('')}</ol>`:
-'لا يوجد من أصاب جميع النتائج المكتملة حتى الآن.';
-
-lastText=makeSummaryText();
+    lastText=makeSummaryText();
 }
 
 function classifyLivePrediction(pm,cm,liveA,liveB){
-if(!pm)return 'out';
-
-const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
-const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
-
-if(!direct&&!reverse)return 'out';
-
-const pa=direct?pm.a.score:pm.b.score;
-const pb=direct?pm.b.score:pm.a.score;
-
-if(pa===null||pb===null)return 'near';
-if(pa<liveA||pb<liveB)return 'out';
-if(pa===liveA&&pb===liveB)return 'current';
-
-return 'near';
+    if(!pm)return 'out';
+    const direct=teamSim(pm.a.team,cm.a.team)&&teamSim(pm.b.team,cm.b.team);
+    const reverse=teamSim(pm.a.team,cm.b.team)&&teamSim(pm.b.team,cm.a.team);
+    if(!direct&&!reverse)return 'out';
+    const pa=direct?pm.a.score:pm.b.score;
+    const pb=direct?pm.b.score:pm.a.score;
+    if(pa===null||pb===null)return 'near';
+    if(pa<liveA||pb<liveB)return 'out';
+    if(pa===liveA&&pb===liveB)return 'current';
+    return 'near';
 }
 
 function updateLive(){
-if(!lastPeople.length||!lastCorrect.length){
-alert('فرز التوقعات أولاً.');
-return;
-}
-
-const idx=Number($('liveMatch').value);
-const cm=lastCorrect[idx];
-
-if(!cm)return;
-
-const minute=Math.max(0,Number($('liveMinute').value)||0);
-const a=Math.max(0,Number($('liveScoreA').value)||0);
-const b=Math.max(0,Number($('liveScoreB').value)||0);
-
-const mode=$('matchMode').value;
-const groups={current:[],near:[],out:[]};
-
-for(const p of lastPeople){
-const pm=matchParticipantGame(p,cm,mode,new Set());
-const category=classifyLivePrediction(pm,cm,a,b);
-groups[category].push({name:p.name,pred:pm});
-}
-
-$('liveCorrectCount').textContent=groups.current.length+' مطابق حاليًا';
-$('liveNearCount').textContent=groups.near.length+' الأقرب';
-$('liveOutCount').textContent=groups.out.length+' مستبعد';
-
-const box=(title,arr)=>
-`<div class="result-group"><h4>${title} (${arr.length})</h4><p>${arr.length?arr.map(x=>`${esc(x.name)}${x.pred?' — '+esc(x.pred.a.team)+' '+(x.pred.a.score??'؟')+'-'+(x.pred.b.score??'؟')+' '+esc(x.pred.b.team):''}`).join('<br>'):'لا يوجد'}</p></div>`;
-
-$('liveResults').innerHTML=
-`<p><b>الدقيقة ${minute} — ${esc(cm.a.team)} ${a} × ${b} ${esc(cm.b.team)}</b></p>`+
-box('✅ مطابق حاليًا',groups.current)+
-box('🎯 الأقرب وما زال ممكنًا',groups.near)+
-box('❌ مستبعد',groups.out);
+    if(!lastPeople.length||!lastCorrect.length){
+        alert('فرز التوقعات أولاً.');
+        return;
+    }
+    const idx=Number($('liveMatch').value);
+    const cm=lastCorrect[idx];
+    if(!cm)return;
+    const minute=Math.max(0,Number($('liveMinute').value)||0);
+    const a=Math.max(0,Number($('liveScoreA').value)||0);
+    const b=Math.max(0,Number($('liveScoreB').value)||0);
+    const mode=$('matchMode').value;
+    const groups={current:[],near:[],out:[]};
+    for(const p of lastPeople){
+        const pm=matchParticipantGame(p,cm,mode,new Set());
+        const category=classifyLivePrediction(pm,cm,a,b);
+        groups[category].push({name:p.name,pred:pm});
+    }
+    $('liveCorrectCount').textContent=groups.current.length+' مطابق حاليًا';
+    $('liveNearCount').textContent=groups.near.length+' الأقرب';
+    $('liveOutCount').textContent=groups.out.length+' مستبعد';
+    const box=(title,arr)=>
+    `<div class="result-group"><h4>${title} (${arr.length})</h4><p>${arr.length?arr.map(x=>`${esc(x.name)}${x.pred?' — '+esc(x.pred.a.team)+' '+(x.pred.a.score??'؟')+'-'+(x.pred.b.score??'؟')+' '+esc(x.pred.b.team):''}`).join('<br>'):'لا يوجد'}</p></div>`;
+    $('liveResults').innerHTML=
+    `<p><b>الدقيقة ${minute} — ${esc(cm.a.team)} ${a} × ${b} ${esc(cm.b.team)}</b></p>`+
+    box('✅ مطابق حاليًا',groups.current)+
+    box('🎯 الأقرب وما زال ممكنًا',groups.near)+
+    box('❌ مستبعد',groups.out);
 }
 
 function makeSummaryText(){
-let s='🏆 صدى العندليب — أصحاب التوقعات المطابقة\n';
-
-for(const r of lastSummary){
-if(r.result==='لم تُلعب / غير مكتملة')continue;
-
-s+='\n'+r.index+'. '+r.match+' ('+r.result+')\n';
-s+=r.names.length?r.names.map((n,i)=>(i+1)+'- '+n).join('\n'):'لا يوجد توقع مطابق';
-s+='\n';
-}
-
-return s;
+    let s='🏆 صدى العندليب — أصحاب التوقعات المطابقة\n';
+    for(const r of lastSummary){
+        if(r.result==='لم تُلعب / غير مكتملة')continue;
+        s+='\n'+r.index+'. '+r.match+' ('+r.result+')\n';
+        s+=r.names.length?r.names.map((n,i)=>(i+1)+'- '+n).join('\n'):'لا يوجد توقع مطابق';
+        s+='\n';
+    }
+    return s;
 }
 
 async function copyText(t){
-try{
-await navigator.clipboard.writeText(t);
-alert('تم النسخ.');
-}catch(e){
-const ta=document.createElement('textarea');
-ta.value=t;
-document.body.appendChild(ta);
-ta.select();
-document.execCommand('copy');
-ta.remove();
-alert('تم النسخ.');
-}
+    try{
+        await navigator.clipboard.writeText(t);
+        alert('تم النسخ.');
+    }catch(e){
+        const ta=document.createElement('textarea');
+        ta.value=t;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        alert('تم النسخ.');
+    }
 }
 
 $('sortBtn').addEventListener('click',runSort);
 $('liveBtn').addEventListener('click',updateLive);
-
 $('liveMatch').addEventListener('change',()=>{
-const m=lastCorrect[Number($('liveMatch').value)];
-if(m && resultKnown(m)){
-$('liveScoreA').value=m.a.score;
-$('liveScoreB').value=m.b.score;
-}
+    const m=lastCorrect[Number($('liveMatch').value)];
+    if(m && resultKnown(m)){
+        $('liveScoreA').value=m.a.score;
+        $('liveScoreB').value=m.b.score;
+    }
 });
-
 $('pointsPerMatch').addEventListener('change',()=>{
-if(lastPeople.length)runSort();
+    if(lastPeople.length)runSort();
 });
-
 $('allBox').addEventListener('input',()=>{
-const p=parseAll();
-$('participants').textContent=p.length+' مشارك (مبدئي)';
-$('parsedCount').textContent=p.filter(x=>x.matches.length).length+' توقع مقروء';
+    const p=parseAll();
+    $('participants').textContent=p.length+' مشارك (مبدئي)';
+    $('parsedCount').textContent=p.filter(x=>x.matches.length).length+' توقع مقروء';
 });
-
 $('copyBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-copyText(lastText);
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    copyText(lastText);
 };
-
 $('waBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-window.open('https://wa.me/?text='+encodeURIComponent(lastText),'_blank');
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    window.open('https://wa.me/?text='+encodeURIComponent(lastText),'_blank');
 };
-
 $('perfectWaBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-const t='👑 أصحاب التوقع الكامل — صدى العندليب\n'+
-(lastPerfect.length?lastPerfect.map((p,i)=>(i+1)+'. '+p.name).join('\n'):'لا يوجد حتى الآن');
-window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    const t='👑 أصحاب التوقع الكامل — صدى العندليب\n'+
+    (lastPerfect.length?lastPerfect.map((p,i)=>(i+1)+'. '+p.name).join('\n'):'لا يوجد حتى الآن');
+    window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 };
-
 $('csvBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-
-const rows=[
-['رقم','المباراة','النتيجة الصحيحة','عدد المطابقين','الأسماء'],
-...lastSummary.map(r=>[r.index,r.match,r.result,r.names.length,r.names.join('، ')])
-];
-
-const csv='\ufeff'+rows.map(row=>
-row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')
-).join('\r\n');
-
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-a.download='صدى-العندليب-النتائج.csv';
-a.click();
-URL.revokeObjectURL(a.href);
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    const rows=[
+        ['رقم','المباراة','النتيجة الصحيحة','عدد المطابقين','الأسماء'],
+        ...lastSummary.map(r=>[r.index,r.match,r.result,r.names.length,r.names.join('، ')])
+    ];
+    const csv='\ufeff'+rows.map(row=>
+    row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')
+    ).join('\r\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download='صدى-العندليب-النتائج.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
 };
 
 function makeImageText(perfect=false){
-if(perfect){
-return 'صدى العندليب\nأصحاب التوقع الكامل\n\n'+
-(lastPerfect.length?lastPerfect.map((p,i)=>(i+1)+'. '+p.name+' — '+p.hits+'/'+p.total).join('\n'):'لا يوجد حتى الآن');
-}
-return lastText||'صدى العندليب';
+    if(perfect){
+        return 'صدى العندليب\nأصحاب التوقع الكامل\n\n'+
+        (lastPerfect.length?lastPerfect.map((p,i)=>(i+1)+'. '+p.name+' — '+p.hits+'/'+p.total).join('\n'):'لا يوجد حتى الآن');
+    }
+    return lastText||'صدى العندليب';
 }
 
 function imageCanvas(text){
-const lines=text.split('\n');
-const c=document.createElement('canvas');
-const ctx=c.getContext('2d');
-const width=1000,pad=35,lineH=34;
-
-c.width=width;
-c.height=Math.max(220,pad*2+lines.length*lineH);
-
-ctx.fillStyle='#f4f7f6';
-ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle='#0b2e59';
-ctx.fillRect(0,0,width,90);
-ctx.fillStyle='white';
-ctx.font='bold 30px Tahoma';
-ctx.textAlign='center';
-ctx.fillText('🔥 صدى العندليب',width/2,55);
-
-ctx.fillStyle='#17212b';
-ctx.font='22px Tahoma';
-ctx.textAlign='right';
-
-let y=130;
-
-for(const line of lines){
-if(y>c.height-20)break;
-ctx.fillText(line.slice(0,75),width-pad,y);
-y+=lineH;
-}
-
-return c;
+    const lines=text.split('\n');
+    const c=document.createElement('canvas');
+    const ctx=c.getContext('2d');
+    const width=1000,pad=35,lineH=34;
+    c.width=width;
+    c.height=Math.max(220,pad*2+lines.length*lineH);
+    ctx.fillStyle='#f4f7f6';
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#0b2e59';
+    ctx.fillRect(0,0,width,90);
+    ctx.fillStyle='white';
+    ctx.font='bold 30px Tahoma';
+    ctx.textAlign='center';
+    ctx.fillText('🔥 صدى العندليب',width/2,55);
+    ctx.fillStyle='#17212b';
+    ctx.font='22px Tahoma';
+    ctx.textAlign='right';
+    let y=130;
+    for(const line of lines){
+        if(y>c.height-20)break;
+        ctx.fillText(line.slice(0,75),width-pad,y);
+        y+=lineH;
+    }
+    return c;
 }
 
 function saveCanvas(c){
-const a=document.createElement('a');
-a.download='صدى-العندليب.png';
-a.href=c.toDataURL('image/png');
-a.click();
+    const a=document.createElement('a');
+    a.download='صدى-العندليب.png';
+    a.href=c.toDataURL('image/png');
+    a.click();
 }
 
 $('imageBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-saveCanvas(imageCanvas(makeImageText()));
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    saveCanvas(imageCanvas(makeImageText()));
 };
-
 $('perfectImageBtn').onclick=()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-saveCanvas(imageCanvas(makeImageText(true)));
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    saveCanvas(imageCanvas(makeImageText(true)));
 };
-
 $('shareImageBtn').onclick=async()=>{
-if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
-
-const c=imageCanvas(makeImageText());
-const blob=await new Promise(r=>c.toBlob(r,'image/png'));
-const file=new File([blob],'sada-results.png',{type:'image/png'});
-
-if(navigator.canShare && navigator.canShare({files:[file]})){
-try{
-await navigator.share({
-files:[file],
-title:'نتائج صدى العندليب',
-text:'أصحاب التوقعات المطابقة'
-});
-}catch(e){}
-}else{
-saveCanvas(c);
-alert('تم إنشاء الصورة. افتح واتساب وأرفق الصورة المحفوظة.');
-}
+    if(!lastSummary.length){alert('افرز التوقعات أولاً');return;}
+    const c=imageCanvas(makeImageText());
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    const file=new File([blob],'sada-results.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{
+            await navigator.share({
+                files:[file],
+                title:'نتائج صدى العندليب',
+                text:'أصحاب التوقعات المطابقة'
+            });
+        }catch(e){}
+    }else{
+        saveCanvas(c);
+        alert('تم إنشاء الصورة. افتح واتساب وأرفق الصورة المحفوظة.');
+    }
 };
 </script>
 </body>
